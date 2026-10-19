@@ -1,4 +1,4 @@
-# Windows PowerShell 环境检查脚本（只读，不安装软件）
+﻿# Windows PowerShell 环境检查脚本（只读，不安装软件）
 $ErrorActionPreference = "Continue"
 Write-Host "=== Study OS Windows 开发环境检查 ===" -ForegroundColor Cyan
 Write-Host "PowerShell: $($PSVersionTable.PSVersion)"
