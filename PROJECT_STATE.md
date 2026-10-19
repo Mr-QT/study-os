@@ -34,6 +34,7 @@
 | `pnpm build` | API tsup 成功；Web `next build` 成功，`/zh-CN`、`/en` 预渲染 |
 | `pnpm test:e2e` | 7 passed（smoke 4 + axe 2 + 双视口 1）；截图 `docs/screenshots/` |
 | `DATABASE_URL=… pnpm --filter @study-os/api test` | 7 passed（含 2 个真实 PostgreSQL 集成测试） |
+| 生产产物启动（`node apps/api/dist/index.js` + `next start`） | `/health`、`/zh-CN`、`/en` 均 200，停止后端口释放 |
 
 ## 未完成项
 

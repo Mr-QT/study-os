@@ -27,6 +27,7 @@ pnpm dev
 | `pnpm build` | API 打包（tsup）+ Web 生产构建 |
 | `pnpm test:e2e` | Playwright smoke，自动拉起 API/Web |
 | `pnpm db:up` / `pnpm db:down` | 本地 PostgreSQL（需 Docker Desktop） |
+| `pnpm verify:db` | 启动容器并跑真实数据库集成测试（重启后使用） |
 
 ### 仓库结构
 

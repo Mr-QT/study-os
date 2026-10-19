@@ -35,6 +35,7 @@
   - `pnpm test:e2e` → 7 passed（smoke 4、axe 无障碍 2、手机/平板视口 1）
   - `pnpm dev` 手工验证 → `/health` 200、`/zh-CN` 200，停止后端口释放
   - `.env` 自动加载验证 → 临时设置 `API_PORT=4011` 后 API 仅在 4011 监听
+  - 生产产物启动 → `node apps/api/dist/index.js` 与 `next start` 均返回 200，停止后端口释放
 
 - 真实业务流程验收：仅验证“Web 读取 API 真实健康状态”这一条链路；无业务数据流。
 
