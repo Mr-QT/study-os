@@ -15,6 +15,7 @@ pnpm dev
 - Web：http://localhost:3000（自动跳转 `/zh-CN`，可切换 `/en`）
 - API：http://127.0.0.1:4000/health、http://127.0.0.1:4000/ready
 - 未配置 `DATABASE_URL` 时，状态页显示「未配置（本地模式）」，服务不会崩溃。
+- 可选：复制 `.env.example` 为 `.env`，API 会自动加载（真实进程环境变量优先）。
 
 ### 质量命令
 

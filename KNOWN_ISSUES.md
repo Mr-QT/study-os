@@ -12,8 +12,7 @@
 - 业务功能全部未实现：学习空间、课程、任务、日历、笔记、文件、AI、同步等均为 `PLANNED`。
 - 无认证、无持久化业务数据、无数据库 schema/迁移。
 - ORM、身份、IndexedDB、检索、队列、对象存储、插件沙箱均未选型（ADR-0006）。
-- 无障碍仅做基础（`lang`、跳过导航、`aria-live`、`prefers-reduced-motion`），未执行 axe 或完整 WCAG 2.2 AA 审计。
-- `.env` 不会自动加载：API 使用默认值或进程环境变量；`docker compose` 会自动读取根目录 `.env`。
+- 无障碍：已通过 axe 的 WCAG 2.0/2.1 A/AA 自动扫描；尚未做读屏、键盘人工走查与完整 WCAG 2.2 AA 审计。
 - `MANIFEST.json` 是启动包初始快照；新增工程文件后不再匹配，属预期行为。
 - CI 配置已写好，但只在本地跑过，尚未在 GitHub Actions 上实际执行。
 

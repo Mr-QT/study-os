@@ -1,5 +1,12 @@
+import { fileURLToPath } from "node:url";
+
+import { config as loadEnv } from "dotenv";
+
 import { buildApp } from "./app";
 import { loadConfig } from "./config";
+
+// Optional repo-root .env for local development; real process env always wins.
+loadEnv({ path: fileURLToPath(new URL("../../../.env", import.meta.url)), quiet: true });
 
 const config = loadConfig();
 const app = await buildApp(config);

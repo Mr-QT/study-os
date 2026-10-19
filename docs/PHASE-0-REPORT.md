@@ -32,12 +32,13 @@
   - `pnpm typecheck` → contracts / api / web 全部通过
   - `pnpm test` → 10 passed（contracts 5、api 5）
   - `pnpm build` → API tsup 成功；Web 预渲染 `/zh-CN`、`/en`
-  - `pnpm test:e2e` → 4 passed
+  - `pnpm test:e2e` → 7 passed（smoke 4、axe 无障碍 2、手机/平板视口 1）
   - `pnpm dev` 手工验证 → `/health` 200、`/zh-CN` 200，停止后端口释放
+  - `.env` 自动加载验证 → 临时设置 `API_PORT=4011` 后 API 仅在 4011 监听
 
 - 真实业务流程验收：仅验证“Web 读取 API 真实健康状态”这一条链路；无业务数据流。
 
-- 截图：`docs/screenshots/zh-CN-home.png`、`docs/screenshots/en-home.png`（桌面 1280×840；尚未做 iPad/手机截图）
+- 截图：`docs/screenshots/zh-CN-home.png`、`en-home.png`（桌面 1280×840）、`phone-home.png`（390×844）、`tablet-home.png`（820×1180）
 
 - 安全、隐私、同步、费用风险：无真实数据、无外部 AI 调用、无密钥；日志已脱敏 `authorization`/`cookie`；开发服务器已限定 `127.0.0.1`。
 

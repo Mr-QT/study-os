@@ -5,7 +5,7 @@
 - 当前里程碑：0.1–0.2 完成，0.3（数据库）部分完成，0.4 进行中
 - 已通过用户验收：无
 - 应用代码：已生成工程骨架 `apps/web`、`apps/api`、`packages/contracts`；无业务功能
-- 测试结果：单元/契约 10 通过；Playwright smoke 4 通过；lint/typecheck/build 通过
+- 测试结果：单元/契约 10 通过；Playwright 7 通过（含 axe WCAG A/AA 与手机/平板视口）；lint/typecheck/build 通过
 - 部署状态：未部署
 - 数据库：**未验证**（WSL2 待重启生效，Docker Desktop 4.95.0 已安装但引擎未启动）
 - 已确认技术基线：见 `docs/adr/`（全部为 Proposed，待批准）
@@ -32,14 +32,14 @@
 | `pnpm typecheck` | contracts / api / web 全部通过 |
 | `pnpm test` | 10 passed（contracts 5、api 5） |
 | `pnpm build` | API tsup 成功；Web `next build` 成功，`/zh-CN`、`/en` 预渲染 |
-| `pnpm test:e2e` | 4 passed；截图 `test-results/zh-CN-home.png`、`test-results/en-home.png` |
+| `pnpm test:e2e` | 7 passed（smoke 4 + axe 2 + 双视口 1）；截图 `docs/screenshots/` |
 
 ## 未完成项
 
 - Docker Desktop / WSL2：功能已启用，但**系统需要重启**后 `docker` 引擎才可用；`infra/docker/docker-compose.yml` 尚未运行验证。
 - 数据库 schema、迁移工具、ORM（ADR-0004）未选型、未验证。
 - CI 仅本地通过，尚未在 GitHub Actions 远端运行。
-- 无障碍仅基础实现，未做 axe/WCAG 2.2 AA 审计。
+- 无障碍：axe 自动扫描 WCAG 2.0/2.1 A/AA 无违规；未做读屏/键盘人工走查。
 
 ## 下一步
 
