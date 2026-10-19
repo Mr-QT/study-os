@@ -5,7 +5,7 @@
 - 当前里程碑：0.1–0.2 完成，0.3（数据库）部分完成，0.4 进行中
 - 已通过用户验收：无
 - 应用代码：已生成工程骨架 `apps/web`、`apps/api`、`packages/contracts`；无业务功能
-- 测试结果：单元/契约 10 通过；数据库集成 2 通过（提供 `DATABASE_URL` 时运行）；Playwright 7 通过（含 axe WCAG A/AA 与手机/平板视口）；lint/typecheck/build 通过
+- 测试结果：单元 16 通过（contracts 5、api 11）；数据库集成 2 通过（提供 `DATABASE_URL` 时运行）；Playwright 7 通过（含 axe WCAG A/AA 与手机/平板视口）；lint/typecheck/build 通过
 - 部署状态：未部署
 - 数据库：**连接与就绪已验证**（便携版 PostgreSQL 16.14，临时实例，已清理）；Docker Compose 编排仍待重启验证
 - 已确认技术基线：见 `docs/adr/`（全部为 Proposed，待批准）
@@ -33,7 +33,7 @@
 | `pnpm test` | 10 passed（contracts 5、api 5） |
 | `pnpm build` | API tsup 成功；Web `next build` 成功，`/zh-CN`、`/en` 预渲染 |
 | `pnpm test:e2e` | 7 passed（smoke 4 + axe 2 + 双视口 1）；截图 `docs/screenshots/` |
-| `DATABASE_URL=… pnpm --filter @study-os/api test` | 7 passed（含 2 个真实 PostgreSQL 集成测试） |
+| `pnpm test` | 16 passed（contracts 5、api 11；2 个 DB 集成用例在无 DATABASE_URL 时跳过） |
 | 生产产物启动（`node apps/api/dist/index.js` + `next start`） | `/health`、`/zh-CN`、`/en` 均 200，停止后端口释放 |
 
 ## 未完成项

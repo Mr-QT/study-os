@@ -30,7 +30,7 @@
 - 测试命令与实际结果：
   - `pnpm lint` → 0 错误
   - `pnpm typecheck` → contracts / api / web 全部通过
-  - `pnpm test` → 10 passed（contracts 5、api 5）；提供 `DATABASE_URL` 时另加 2 个 PostgreSQL 集成用例通过
+  - `pnpm test` → 16 passed（contracts 5、api 11）；提供 `DATABASE_URL` 时另加 2 个 PostgreSQL 集成用例通过
   - `pnpm build` → API tsup 成功；Web 预渲染 `/zh-CN`、`/en`
   - `pnpm test:e2e` → 7 passed（smoke 4、axe 无障碍 2、手机/平板视口 1）
   - `pnpm dev` 手工验证 → `/health` 200、`/zh-CN` 200，停止后端口释放
