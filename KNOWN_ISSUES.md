@@ -2,7 +2,7 @@
 
 ## 环境
 
-- **Docker Desktop 与 WSL2 未安装**：`infra/docker/docker-compose.yml` 从未运行，PostgreSQL 集成未验证。
+- **WSL2 已启用但需要重启**：Docker Desktop 4.95.0 已安装，`com.docker.service` 未启动，`docker version` 无法连接引擎；`infra/docker/docker-compose.yml` 从未运行，PostgreSQL 集成未验证。
 - 本机 Python 只有 Microsoft Store 占位符（0 字节），阶段 1 需要 FastAPI 时须安装真实 Python 3.12+。
 - Git / Node 安装在非默认路径（`D:\Git`、`D:\nodejs`），已写入用户 PATH；新终端才生效。
 - 工作区路径含空格（`D:\Study OS`），当前工具链均正常；部分旧脚本可能需引号。
