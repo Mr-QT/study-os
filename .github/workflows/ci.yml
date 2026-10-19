@@ -9,6 +9,22 @@ jobs:
   quality:
     name: lint / typecheck / unit / build
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: studyos
+          POSTGRES_PASSWORD: studyos
+          POSTGRES_DB: studyos
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U studyos -d studyos"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://studyos:studyos@localhost:5432/studyos
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

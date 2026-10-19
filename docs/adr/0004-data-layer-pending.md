@@ -14,6 +14,7 @@
 | PostgreSQL 16 + Kysely | 纯查询构建、类型安全 | 迁移与建模需自行组织 | 未实测 |
 
 - 当前决策：**只确定 PostgreSQL 16（Docker Compose）为候选数据库**；ORM 暂不选定。`apps/api` 仅在设置 `DATABASE_URL` 时连接数据库，未设置时健康检查返回 `disabled`，保证本地零依赖可运行。
+- 已验证（2026-10-19）：临时便携版 PostgreSQL 16.14 上，`/health` 返回 `checks.database="ok"`，`/ready` 返回 200 `ready`；`apps/api/test/database.integration.test.ts` 2 个用例通过，未设置 `DATABASE_URL` 时自动跳过。Docker Compose 编排本身仍未运行。
 - 待验证：容器启动、迁移工具、事务与回滚、连接池、时区处理。
 - 安全/隐私/性能/成本影响：数据库凭据只经环境变量传入；默认仅监听本机端口。
 - 回退方案：ORM 可替换，迁移脚本需重写；业务层通过仓储接口隔离。

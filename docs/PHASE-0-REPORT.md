@@ -7,7 +7,7 @@
   - 共享契约：`packages/contracts/src/index.ts`（健康检查、就绪、错误 envelope 的 Zod schema）
   - API：`apps/api/src/{app,config,db,index}.ts`、`apps/api/src/routes/health.ts`（Fastify 5，`/health`、`/ready`、统一错误、CORS、日志脱敏）
   - Web：`apps/web/app/[lang]/{layout,page}.tsx`、`apps/web/components/{system-status,locale-switcher}.tsx`、`apps/web/lib/{i18n,api}.ts`（Next 16，中英双语，真实状态页）
-  - 测试：`packages/contracts/src/index.test.ts`、`apps/api/test/health.test.ts`、`tests/e2e/smoke.spec.ts`
+  - 测试：`packages/contracts/src/index.test.ts`、`apps/api/test/health.test.ts`、`apps/api/test/database.integration.test.ts`、`tests/e2e/smoke.spec.ts`、`tests/e2e/a11y-responsive.spec.ts`
   - CI：`.github/workflows/ci.yml`
   - 容器：`infra/docker/docker-compose.yml`（PostgreSQL 16，未运行验证）
   - ADR：`docs/adr/0001–0006`（均为 Proposed）
@@ -30,7 +30,7 @@
 - 测试命令与实际结果：
   - `pnpm lint` → 0 错误
   - `pnpm typecheck` → contracts / api / web 全部通过
-  - `pnpm test` → 10 passed（contracts 5、api 5）
+  - `pnpm test` → 10 passed（contracts 5、api 5）；提供 `DATABASE_URL` 时另加 2 个 PostgreSQL 集成用例通过
   - `pnpm build` → API tsup 成功；Web 预渲染 `/zh-CN`、`/en`
   - `pnpm test:e2e` → 7 passed（smoke 4、axe 无障碍 2、手机/平板视口 1）
   - `pnpm dev` 手工验证 → `/health` 200、`/zh-CN` 200，停止后端口释放
@@ -42,11 +42,11 @@
 
 - 安全、隐私、同步、费用风险：无真实数据、无外部 AI 调用、无密钥；日志已脱敏 `authorization`/`cookie`；开发服务器已限定 `127.0.0.1`。
 
-- 数据库迁移及恢复：未实现。
+- 数据库迁移及恢复：未实现；数据库连接与就绪已用临时便携版 PostgreSQL 16.14 验证（`checks.database="ok"`、`/ready` 200），Docker Compose 尚未运行。
 
 - 已知问题：
   - WSL2 功能已启用但**需要重启**才生效；`com.docker.service` 未启动，`docker compose` 尚未运行。
-  - Docker Desktop 4.95.0 已安装。
+  - Docker Desktop 4.95.0 已安装；便携版 PostgreSQL 已删除，本地无常驻数据库。
   - 其余见 `KNOWN_ISSUES.md`。
 
 - 文档更新：`README.md`、`PROJECT_STATE.md`、`TASKS.md`、`HANDOFF.md`、`KNOWN_ISSUES.md`、`docs/adr/*`
