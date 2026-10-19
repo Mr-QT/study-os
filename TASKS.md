@@ -7,6 +7,6 @@
 | P0-03 | monorepo 与开发脚本 | DONE | pnpm workspace、tsconfig base、ESLint/Prettier、`pnpm dev` 可用 |
 | P0-04 | API、DB、PWA 骨架 | PARTIAL | API `/health` `/ready`、Web 双语状态页完成；PostgreSQL 连接/就绪已用便携实例验证（2 个集成测试通过）；ORM/迁移未完成，Docker Compose 待重启验证 |
 | P0-05 | CI、测试与视觉 smoke | PARTIAL | 单测 10、E2E 7 通过（含 axe A/AA、手机/平板无溢出）；截图已生成；CI 未远端运行 |
-| P0-06 | 阶段 0 验收与交接 | TODO | 待 Docker/DB 验证后提交，等待用户批准 |
+| P0-06 | 阶段 0 验收与交接 | IN_PROGRESS | 验收清单见 `docs/PHASE-0-ACCEPTANCE.md`；等待用户批准，Compose 验证待重启 |
 
 状态限定：TODO / IN_PROGRESS / BLOCKED / PARTIAL / DONE（DONE 需证据）。

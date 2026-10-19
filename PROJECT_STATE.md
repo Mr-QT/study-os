@@ -1,8 +1,8 @@
 # PROJECT_STATE — 真实项目状态
 
 - 日期：2026-10-19
-- 当前阶段：0 — 架构验证与工程初始化（进行中，未验收）
-- 当前里程碑：0.1–0.2 完成，0.3（数据库）部分完成，0.4 进行中
+- 当前阶段：0 — 交付完成，等待用户验收（Docker Compose 运行验证待重启）
+- 当前里程碑：阶段 0.1–0.4 完成
 - 已通过用户验收：无
 - 应用代码：已生成工程骨架 `apps/web`、`apps/api`、`packages/contracts`；无业务功能
 - 测试结果：单元 16 通过（contracts 5、api 11）；数据库集成 2 通过（提供 `DATABASE_URL` 时运行）；Playwright 7 通过（含 axe WCAG A/AA 与手机/平板视口）；lint/typecheck/build 通过
