@@ -20,7 +20,8 @@
     "format:check": "prettier --check .",
     "db:up": "docker compose -f infra/docker/docker-compose.yml up -d",
     "db:down": "docker compose -f infra/docker/docker-compose.yml down",
-    "check:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-windows.ps1"
+    "check:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-windows.ps1",
+    "verify:db": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-db.ps1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
