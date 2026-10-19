@@ -1,0 +1,180 @@
+{
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 2756,
+      "sha256": "8b2b7c63c20dd3c65446998d1ab76ac622c65cb8059a93d991aeba0113bd0d03"
+    },
+    {
+      "path": "HANDOFF.md",
+      "bytes": 533,
+      "sha256": "35c31264ce2778bbe416ebfb54caa0c5b08140aa7ede90d89cca4c7e17923652"
+    },
+    {
+      "path": "KNOWN_ISSUES.md",
+      "bytes": 471,
+      "sha256": "6b6434349c3624b4dd39e290d0f848d5d6ff48ccbe6e3ddf0abf7237e3220c0b"
+    },
+    {
+      "path": "PROJECT_STATE.md",
+      "bytes": 534,
+      "sha256": "925e0e3a888ce967a5b57e33a5581d3e0739d1ccc6283e97483cc69131604b08"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2911,
+      "sha256": "81deeaa05e7a9f5daddd9ff8f345119515110b6f72e5e3cde006e3a1872a368b"
+    },
+    {
+      "path": "START-HERE.txt",
+      "bytes": 437,
+      "sha256": "25c37528f077e28e46fedc3cecd4415f23c08d8986210b66c7033916a6b7a75a"
+    },
+    {
+      "path": "TASKS.md",
+      "bytes": 526,
+      "sha256": "db3a4d3047447e4c4f7dc95710d45d94608fa5f3fbee4211e83e8151bf6015e0"
+    },
+    {
+      "path": "checklists/MILESTONE-ACCEPTANCE.md",
+      "bytes": 1054,
+      "sha256": "46b3764fa6272ed20185fb265f0ddb19e6bbf3409a08e7f724e215a919c0c48d"
+    },
+    {
+      "path": "decisions/README.md",
+      "bytes": 253,
+      "sha256": "847efdb7f9582a6cc438df28d2588ed474993304d25791380c20dbae4c0d76e3"
+    },
+    {
+      "path": "docs/API-CONTRACTS.md",
+      "bytes": 2092,
+      "sha256": "ab9339f9c6ce272d41aa0e3335d5490dec98cd7c639bc8eace5dc28f3a1f0ea3"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "bytes": 5039,
+      "sha256": "aa138ab4df7957b09baa34e9c6858bfcdcd1264eae8c4558c63694d2816650f3"
+    },
+    {
+      "path": "docs/DATA-MODEL.md",
+      "bytes": 3116,
+      "sha256": "04d8d8f39db044f016b6cab27049a3a24da261667f853a27d5248d0edf7c0c9a"
+    },
+    {
+      "path": "docs/DECISIONS-50.md",
+      "bytes": 3415,
+      "sha256": "8c689ed1d51d4f37c8dc5f213f131d8a5d27668351f1e2edc186306f98661eb6"
+    },
+    {
+      "path": "docs/DESIGN-SYSTEM.md",
+      "bytes": 1949,
+      "sha256": "0d8439e5f428634e3eafc2fa4c4e749a3c189ec0a82874e70308eda726d1913b"
+    },
+    {
+      "path": "docs/ONBOARDING-AND-I18N.md",
+      "bytes": 1224,
+      "sha256": "eabd41d9ea65d4107f712eeeab49232c44a04c869fba8c7101c85609100b9c22"
+    },
+    {
+      "path": "docs/OPERATIONS.md",
+      "bytes": 2156,
+      "sha256": "3cc7acc58dbf2a30e02adb6a9333878018c61dd18060cd1830e6fe2d4bd9bc47"
+    },
+    {
+      "path": "docs/PRD.md",
+      "bytes": 7033,
+      "sha256": "aa19c91d932d48edbd12f73da4859f16c0860aae9a0aa4888c2b69e986115812"
+    },
+    {
+      "path": "docs/QUALITY-AND-ACCEPTANCE.md",
+      "bytes": 3044,
+      "sha256": "132eb55c44d954c0b5e3f6571d352569239364518a7a89960fffe7bb6b718e87"
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "bytes": 3396,
+      "sha256": "71c87c4b8e732095bf86cf46ac0da8cf8148488f7a80e9cf865ca08eef79bce8"
+    },
+    {
+      "path": "docs/SECURITY-PRIVACY.md",
+      "bytes": 2304,
+      "sha256": "1adf95fadfa7aa8a8ea7a2dda2dae606bffd0d711283883b881b6f59bedea8da"
+    },
+    {
+      "path": "prompts/00-FIRST-RUN.md",
+      "bytes": 2050,
+      "sha256": "71a9ac46cc6fdf03c9790337994b82d340aa12a10bfdeb8b018c22991add897d"
+    },
+    {
+      "path": "prompts/CONTINUE.md",
+      "bytes": 611,
+      "sha256": "1607bb5e15d546470367334048b07e3f8566cea54faf73f72122fe247aae24dd"
+    },
+    {
+      "path": "prompts/FIX.md",
+      "bytes": 479,
+      "sha256": "1059f6817326440b76b831bc72d41670e6d3d27c9e27905e43dbd252de7b607d"
+    },
+    {
+      "path": "prompts/MASTER-PROMPT.md",
+      "bytes": 2833,
+      "sha256": "93c02def0584966ee2285abc427a2e280a7d37e91459f3230de8495e46033259"
+    },
+    {
+      "path": "prompts/REVIEW.md",
+      "bytes": 668,
+      "sha256": "228b72c619d68593bf22fe0025d1367655ac9143bde887d6ea30a2bce1d446ca"
+    },
+    {
+      "path": "prompts/phases/01-FOUNDATION.md",
+      "bytes": 1569,
+      "sha256": "8e406cffdb4ca4b4704fb3e303b67f32e53ff03c38e5892960f900cf8dae25f8"
+    },
+    {
+      "path": "prompts/phases/02-KNOWLEDGE-EXAMS.md",
+      "bytes": 1414,
+      "sha256": "97dd657a3c6d6d135146c7f6ead8f3492309acd6f0d4ecc545093f73ab0422ab"
+    },
+    {
+      "path": "prompts/phases/03-AI-LEARNING.md",
+      "bytes": 1437,
+      "sha256": "e3b706fb10954275515d54bacdbd99a7ee11d366860d9612d250ecce98abbb47"
+    },
+    {
+      "path": "prompts/phases/04-AUTOMATION.md",
+      "bytes": 1431,
+      "sha256": "79ce60bdee7ce56e31075d79f29133e6bcb62b0f05569f1d9629b2376e7820fc"
+    },
+    {
+      "path": "prompts/phases/05-MULTIMODAL-GROWTH.md",
+      "bytes": 1402,
+      "sha256": "54501a1ce4ccd65c4b5c2538a5dd74ed578eb672998c029e8a3ee255bcdae9ec"
+    },
+    {
+      "path": "prompts/phases/06-PLUGINS-COLLAB.md",
+      "bytes": 1413,
+      "sha256": "f193b3df50f17eadcab8da8e449ddfbd03c19a0a158918d3aaacc91d0be11523"
+    },
+    {
+      "path": "prompts/phases/07-HARDENING.md",
+      "bytes": 1418,
+      "sha256": "873b06df2c95ab6b67681aac8b6710e5db792c08f27e78a29018e00885dbe623"
+    },
+    {
+      "path": "scripts/check-windows.ps1",
+      "bytes": 922,
+      "sha256": "bc18bdba25ff0405bdceb93e776bb56d3400381e5cc62637b69440bf26c5f50f"
+    },
+    {
+      "path": "templates/ADR-TEMPLATE.md",
+      "bytes": 280,
+      "sha256": "63d0e833f13b59aa8eff3c39bae9bc7a05128d1dc132042cdd72cc335588b8c5"
+    },
+    {
+      "path": "templates/MILESTONE-REPORT.md",
+      "bytes": 415,
+      "sha256": "9fdbbf6887824d4dc02b84dea86a3edffc64fb8ec83c2d5d59900a974006a9e6"
+    }
+  ],
+  "file_count": 35
+}

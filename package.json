@@ -1,0 +1,41 @@
+{
+  "name": "study-os",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Study OS — personal AI learning operating system (Phase 0 skeleton)",
+  "packageManager": "pnpm@10.34.7",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm run --parallel --filter \"./apps/*\" dev",
+    "dev:api": "pnpm --filter @study-os/api dev",
+    "dev:web": "pnpm --filter @study-os/web dev",
+    "build": "pnpm -r build",
+    "lint": "eslint .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r --if-present test",
+    "test:e2e": "playwright test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose -f infra/docker/docker-compose.yml up -d",
+    "db:down": "docker compose -f infra/docker/docker-compose.yml down"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "@tailwindcss/oxide",
+      "unrs-resolver"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "@playwright/test": "^1.64.1",
+    "eslint": "^9.20.0",
+    "globals": "^17.13.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.0"
+  }
+}

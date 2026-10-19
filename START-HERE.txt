@@ -1,0 +1,9 @@
+Study OS — Codex 项目启动包
+
+1. 在 Windows 上解压整个文件夹。
+2. 打开 README.md，按 Windows 环境要求准备工具。
+3. 用 Codex 打开此目录。
+4. 将 prompts/00-FIRST-RUN.md 全文发送给 Codex。
+5. 首次只执行阶段 0；验收后再按 docs/ROADMAP.md 进入阶段 1。
+
+重要：这是完整开发指导包，不是已写好的 Study OS 应用。所有功能必须逐阶段真实实现并验收。
