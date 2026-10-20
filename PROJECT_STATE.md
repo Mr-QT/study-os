@@ -9,7 +9,7 @@
 - 部署状态：未部署
 - 数据库：PostgreSQL 16.14（便携实例）已应用迁移并跑通集成测试；Docker Compose 仍待重启验证
 - 已确认技术基线：见 `docs/adr/`（全部为 Proposed，待批准）
-- 最近 commit：本次提交后更新
+- 最近 commit：`c2ced89`
 
 ## 环境（实测）
 
