@@ -13,6 +13,8 @@ export const LEARNING_LOG_ENDPOINT = `${API_BASE_URL}/api/v1/learning-logs`;
 export const AI_STATUS_ENDPOINT = `${API_BASE_URL}/api/v1/ai/status`;
 export const AI_REQUESTS_ENDPOINT = `${API_BASE_URL}/api/v1/ai/requests`;
 export const STATS_ENDPOINT = `${API_BASE_URL}/api/v1/stats`;
+export const QUESTIONS_ENDPOINT = `${API_BASE_URL}/api/v1/questions`;
+export const REVIEW_QUEUE_ENDPOINT = `${API_BASE_URL}/api/v1/review/queue`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -72,4 +74,16 @@ export function learningLogEndpoint(spaceId: string, days = 7): string {
 
 export function statsEndpoint(spaceId: string): string {
   return `${STATS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function questionsEndpoint(spaceId: string): string {
+  return `${QUESTIONS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function reviewQueueEndpoint(spaceId: string): string {
+  return `${REVIEW_QUEUE_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function questionAttemptEndpoint(questionId: string): string {
+  return `${QUESTIONS_ENDPOINT}/${questionId}/attempts`;
 }

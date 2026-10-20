@@ -8,6 +8,7 @@ import { AiPanel } from "@/components/ai-panel";
 import { FilesPanel } from "@/components/files-panel";
 import { FocusPanel } from "@/components/focus-panel";
 import { NotesPanel } from "@/components/notes-panel";
+import { QuestionsPanel } from "@/components/questions-panel";
 import { StatsPanel } from "@/components/stats-panel";
 
 import {
@@ -90,6 +91,17 @@ export interface SpaceLabels {
   aiRemaining: string;
   aiError: string;
   aiPrivacyNote: string;
+  questionsTitle: string;
+  questionsEmpty: string;
+  questionPromptPlaceholder: string;
+  questionAnswerPlaceholder: string;
+  questionCreate: string;
+  questionCreating: string;
+  reviewTitle: string;
+  reviewEmpty: string;
+  reviewSubmit: string;
+  reviewCorrect: string;
+  reviewWrong: string;
 }
 
 const jsonHeaders = { "content-type": "application/json", accept: "application/json" };
@@ -561,6 +573,23 @@ export function SpaceWorkspace({
           hint: labels.fileHint,
         }}
       />
+      <QuestionsPanel
+        spaceId={spaceId}
+        labels={{
+          title: labels.questionsTitle,
+          empty: labels.questionsEmpty,
+          promptPlaceholder: labels.questionPromptPlaceholder,
+          answerPlaceholder: labels.questionAnswerPlaceholder,
+          create: labels.questionCreate,
+          creating: labels.questionCreating,
+          reviewTitle: labels.reviewTitle,
+          reviewEmpty: labels.reviewEmpty,
+          submit: labels.reviewSubmit,
+          correct: labels.reviewCorrect,
+          wrong: labels.reviewWrong,
+        }}
+      />
+
       <StatsPanel
         spaceId={spaceId}
         labels={{

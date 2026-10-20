@@ -16,7 +16,7 @@ test.describe("Study OS notes, focus and files", () => {
     await expect(page).toHaveURL(/\/spaces\/[0-9a-f-]+$/);
 
     await expect(page.getByRole("heading", { level: 3, name: "学习统计" })).toBeVisible();
-    await expect(page.getByText("AI 未配置")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: "AI 学习助手" })).toBeVisible();
 
     await page.getByLabel("笔记标题").fill(`极限笔记-${suffix}`);
     await page
@@ -25,6 +25,11 @@ test.describe("Study OS notes, focus and files", () => {
     await page.getByRole("button", { name: "保存笔记" }).click();
     await expect(page.getByRole("heading", { name: `极限笔记-${suffix}` })).toBeVisible();
     await expect(page.getByText("ε-δ 语言")).toBeVisible();
+
+    await page.getByLabel("题目，例如：什么是极限？").fill(`题目-${suffix}`);
+    await page.getByLabel("标准答案").fill("当自变量趋近某值时函数值趋近的确定值");
+    await page.getByRole("button", { name: "添加题目" }).click();
+    await expect(page.getByText(`题目-${suffix}`).first()).toBeVisible();
 
     await page.getByRole("button", { name: "开始专注" }).click();
     await expect(page.getByRole("button", { name: "结束专注" })).toBeVisible();

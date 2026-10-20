@@ -22,6 +22,7 @@ import { focusRoutes } from "./routes/focus";
 import { healthRoutes } from "./routes/health";
 import { learningLogRoutes } from "./routes/learning-log";
 import { noteRoutes } from "./routes/notes";
+import { questionRoutes } from "./routes/questions";
 import { spaceRoutes } from "./routes/spaces";
 import { statsRoutes } from "./routes/stats";
 import { syncRoutes } from "./routes/sync";
@@ -100,6 +101,7 @@ export async function buildApp(
   await app.register(learningLogRoutes);
   await app.register(syncRoutes);
   await app.register(statsRoutes);
+  await app.register(questionRoutes);
 
   return app;
 }

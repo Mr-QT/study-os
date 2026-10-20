@@ -286,6 +286,73 @@ export const syncChanges = pgTable(
   ],
 );
 
+export const questionKindEnum = pgEnum("question_kind", ["short_answer", "single_choice"]);
+
+export const questions = pgTable(
+  "questions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id").references(() => courses.id, { onDelete: "set null" }),
+    prompt: text("prompt").notNull(),
+    answer: text("answer").notNull(),
+    explanation: text("explanation"),
+    kind: questionKindEnum("kind").notNull().default("short_answer"),
+    options: text("options"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("questions_space_idx").on(table.spaceId),
+    index("questions_course_idx").on(table.courseId),
+  ],
+);
+
+export const questionAttempts = pgTable(
+  "question_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    questionId: uuid("question_id")
+      .notNull()
+      .references(() => questions.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    answer: text("answer").notNull(),
+    isCorrect: boolean("is_correct").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("attempts_question_idx").on(table.questionId),
+    index("attempts_user_idx").on(table.userId),
+  ],
+);
+
+export const reviewItems = pgTable(
+  "review_items",
+  {
+    questionId: uuid("question_id")
+      .notNull()
+      .references(() => questions.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    dueAt: timestamp("due_at", { withTimezone: true }).notNull(),
+    intervalDays: integer("interval_days").notNull().default(1),
+    ease: integer("ease").notNull().default(250),
+    repetitions: integer("repetitions").notNull().default(0),
+    lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.questionId, table.userId] }),
+    index("review_due_idx").on(table.dueAt),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -300,3 +367,6 @@ export type FocusSessionRow = typeof focusSessions.$inferSelect;
 export type FileAssetRow = typeof fileAssets.$inferSelect;
 export type AiInvocationRow = typeof aiInvocations.$inferSelect;
 export type SyncChangeRow = typeof syncChanges.$inferSelect;
+export type QuestionRow = typeof questions.$inferSelect;
+export type QuestionAttemptRow = typeof questionAttempts.$inferSelect;
+export type ReviewItemRow = typeof reviewItems.$inferSelect;

@@ -500,3 +500,64 @@ export const statsResponseSchema = z.object({
   }),
 });
 export type StatsResponse = z.infer<typeof statsResponseSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Milestone 2.1 contracts: question bank, wrong answers, review       */
+/* ------------------------------------------------------------------ */
+
+export const questionKindSchema = z.enum(["short_answer", "single_choice"]);
+export type QuestionKind = z.infer<typeof questionKindSchema>;
+
+export const questionSchema = z.object({
+  id: z.string().min(1),
+  spaceId: z.string().min(1),
+  courseId: z.string().nullable(),
+  prompt: z.string().min(1),
+  answer: z.string().min(1),
+  explanation: z.string().nullable(),
+  kind: questionKindSchema,
+  options: z.array(z.string()).nullable(),
+  createdAt: z.string().min(1),
+  updatedAt: z.string().min(1),
+});
+export type QuestionDto = z.infer<typeof questionSchema>;
+
+export const createQuestionInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  courseId: z.string().uuid().nullish(),
+  prompt: z.string().trim().min(1).max(2000),
+  answer: z.string().trim().min(1).max(2000),
+  explanation: z.string().max(2000).nullish(),
+  kind: questionKindSchema.optional(),
+  options: z.array(z.string().max(500)).max(10).optional(),
+});
+export type CreateQuestionInput = z.infer<typeof createQuestionInputSchema>;
+
+export const questionListResponseSchema = z.object({ questions: z.array(questionSchema) });
+export const questionResponseSchema = z.object({ question: questionSchema });
+
+export const attemptInputSchema = z.object({
+  answer: z.string().trim().min(1).max(2000),
+});
+export type AttemptInput = z.infer<typeof attemptInputSchema>;
+
+export const attemptResultSchema = z.object({
+  attemptId: z.string().min(1),
+  correct: z.boolean(),
+  expectedAnswer: z.string().min(1),
+  explanation: z.string().nullable(),
+  intervalDays: z.number().int().positive(),
+  nextDueAt: z.string().min(1),
+});
+export type AttemptResult = z.infer<typeof attemptResultSchema>;
+
+export const reviewQueueItemSchema = z.object({
+  question: questionSchema,
+  dueAt: z.string().min(1),
+  intervalDays: z.number().int().positive(),
+  repetitions: z.number().int().nonnegative(),
+});
+export type ReviewQueueItem = z.infer<typeof reviewQueueItemSchema>;
+
+export const reviewQueueResponseSchema = z.object({ items: z.array(reviewQueueItemSchema) });
+export const wrongAnswersResponseSchema = z.object({ questions: z.array(questionSchema) });
