@@ -353,6 +353,93 @@ export const reviewItems = pgTable(
   ],
 );
 
+export const examStatusEnum = pgEnum("exam_status", ["planned", "completed"]);
+
+export const exams = pgTable(
+  "exams",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id").references(() => courses.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
+    durationMinutes: integer("duration_minutes"),
+    status: examStatusEnum("status").notNull().default("planned"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (table) => [index("exams_space_idx").on(table.spaceId)],
+);
+
+export const examQuestions = pgTable(
+  "exam_questions",
+  {
+    examId: uuid("exam_id")
+      .notNull()
+      .references(() => exams.id, { onDelete: "cascade" }),
+    questionId: uuid("question_id")
+      .notNull()
+      .references(() => questions.id, { onDelete: "cascade" }),
+    position: integer("position").notNull().default(0),
+    points: integer("points").notNull().default(1),
+  },
+  (table) => [
+    primaryKey({ columns: [table.examId, table.questionId] }),
+    index("exam_questions_exam_idx").on(table.examId),
+  ],
+);
+
+export const examAttempts = pgTable(
+  "exam_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    examId: uuid("exam_id")
+      .notNull()
+      .references(() => exams.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    score: integer("score"),
+    maxScore: integer("max_score").notNull().default(0),
+    answers: text("answers"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("exam_attempts_exam_idx").on(table.examId),
+    index("exam_attempts_user_idx").on(table.userId),
+  ],
+);
+
+export const pdfAnnotations = pgTable(
+  "pdf_annotations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    fileId: uuid("file_id")
+      .notNull()
+      .references(() => fileAssets.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    page: integer("page").notNull(),
+    rect: text("rect"),
+    note: text("note"),
+    color: text("color").notNull().default("#F5D7CE"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("pdf_annotations_space_idx").on(table.spaceId),
+    index("pdf_annotations_file_idx").on(table.fileId),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -370,3 +457,7 @@ export type SyncChangeRow = typeof syncChanges.$inferSelect;
 export type QuestionRow = typeof questions.$inferSelect;
 export type QuestionAttemptRow = typeof questionAttempts.$inferSelect;
 export type ReviewItemRow = typeof reviewItems.$inferSelect;
+export type ExamRow = typeof exams.$inferSelect;
+export type ExamQuestionRow = typeof examQuestions.$inferSelect;
+export type ExamAttemptRow = typeof examAttempts.$inferSelect;
+export type PdfAnnotationRow = typeof pdfAnnotations.$inferSelect;

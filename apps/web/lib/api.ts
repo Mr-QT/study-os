@@ -15,6 +15,8 @@ export const AI_REQUESTS_ENDPOINT = `${API_BASE_URL}/api/v1/ai/requests`;
 export const STATS_ENDPOINT = `${API_BASE_URL}/api/v1/stats`;
 export const QUESTIONS_ENDPOINT = `${API_BASE_URL}/api/v1/questions`;
 export const REVIEW_QUEUE_ENDPOINT = `${API_BASE_URL}/api/v1/review/queue`;
+export const EXAMS_ENDPOINT = `${API_BASE_URL}/api/v1/exams`;
+export const EXAM_ATTEMPTS_ENDPOINT = `${API_BASE_URL}/api/v1/exam-attempts`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -86,4 +88,16 @@ export function reviewQueueEndpoint(spaceId: string): string {
 
 export function questionAttemptEndpoint(questionId: string): string {
   return `${QUESTIONS_ENDPOINT}/${questionId}/attempts`;
+}
+
+export function gradesEndpoint(spaceId: string): string {
+  return `${API_BASE_URL}/api/v1/grades?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function examAttemptsStartEndpoint(examId: string): string {
+  return `${EXAMS_ENDPOINT}/${examId}/attempts`;
+}
+
+export function examAttemptEndpoint(attemptId: string): string {
+  return `${EXAM_ATTEMPTS_ENDPOINT}/${attemptId}/submit`;
 }

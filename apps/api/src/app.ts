@@ -14,12 +14,14 @@ import type { ApiConfig } from "./config";
 import { openDatabase } from "./db";
 import { sendError } from "./http/errors";
 import { aiRoutes } from "./routes/ai";
+import { assessmentRoutes } from "./routes/assessment";
 import { authRoutes } from "./routes/auth";
 import { calendarRoutes } from "./routes/calendar";
 import { learningRoutes } from "./routes/courses";
 import { fileRoutes } from "./routes/files";
 import { focusRoutes } from "./routes/focus";
 import { healthRoutes } from "./routes/health";
+import { knowledgeRoutes } from "./routes/knowledge";
 import { learningLogRoutes } from "./routes/learning-log";
 import { noteRoutes } from "./routes/notes";
 import { questionRoutes } from "./routes/questions";
@@ -102,6 +104,8 @@ export async function buildApp(
   await app.register(syncRoutes);
   await app.register(statsRoutes);
   await app.register(questionRoutes);
+  await app.register(assessmentRoutes);
+  await app.register(knowledgeRoutes);
 
   return app;
 }

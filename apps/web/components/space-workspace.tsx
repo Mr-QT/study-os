@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { AiPanel } from "@/components/ai-panel";
+import { ExamsPanel } from "@/components/exams-panel";
 import { FilesPanel } from "@/components/files-panel";
 import { FocusPanel } from "@/components/focus-panel";
 import { NotesPanel } from "@/components/notes-panel";
@@ -102,6 +103,16 @@ export interface SpaceLabels {
   reviewSubmit: string;
   reviewCorrect: string;
   reviewWrong: string;
+  examsTitle: string;
+  examsEmpty: string;
+  examTitlePlaceholder: string;
+  examCreate: string;
+  examCreating: string;
+  examStart: string;
+  examSubmit: string;
+  examScore: string;
+  examAverage: string;
+  examNoQuestions: string;
 }
 
 const jsonHeaders = { "content-type": "application/json", accept: "application/json" };
@@ -573,6 +584,22 @@ export function SpaceWorkspace({
           hint: labels.fileHint,
         }}
       />
+      <ExamsPanel
+        spaceId={spaceId}
+        labels={{
+          title: labels.examsTitle,
+          empty: labels.examsEmpty,
+          titlePlaceholder: labels.examTitlePlaceholder,
+          create: labels.examCreate,
+          creating: labels.examCreating,
+          start: labels.examStart,
+          submit: labels.examSubmit,
+          score: labels.examScore,
+          average: labels.examAverage,
+          noQuestions: labels.examNoQuestions,
+        }}
+      />
+
       <QuestionsPanel
         spaceId={spaceId}
         labels={{

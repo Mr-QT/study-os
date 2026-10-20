@@ -561,3 +561,129 @@ export type ReviewQueueItem = z.infer<typeof reviewQueueItemSchema>;
 
 export const reviewQueueResponseSchema = z.object({ items: z.array(reviewQueueItemSchema) });
 export const wrongAnswersResponseSchema = z.object({ questions: z.array(questionSchema) });
+
+/* ------------------------------------------------------------------ */
+/* Stage 2 remainder: exams, grades, mastery, search, PDF annotations  */
+/* ------------------------------------------------------------------ */
+
+export const examStatusSchema = z.enum(["planned", "completed"]);
+
+export const examSchema = z.object({
+  id: z.string().min(1),
+  spaceId: z.string().min(1),
+  courseId: z.string().nullable(),
+  title: z.string().min(1),
+  scheduledAt: z.string().nullable(),
+  durationMinutes: z.number().int().nullable(),
+  status: examStatusSchema,
+  createdAt: z.string().min(1),
+  updatedAt: z.string().min(1),
+});
+export type ExamDto = z.infer<typeof examSchema>;
+
+export const examPublicQuestionSchema = z.object({
+  id: z.string().min(1),
+  prompt: z.string().min(1),
+  kind: questionKindSchema,
+  options: z.array(z.string()).nullable(),
+  points: z.number().int().positive(),
+});
+
+export const createExamInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  courseId: z.string().uuid().nullish(),
+  title: z.string().trim().min(1).max(200),
+  questionIds: z.array(z.string().uuid()).min(1).max(50),
+  scheduledAt: z.string().optional(),
+  durationMinutes: z.number().int().min(1).max(600).optional(),
+});
+export type CreateExamInput = z.infer<typeof createExamInputSchema>;
+
+export const examListResponseSchema = z.object({ exams: z.array(examSchema) });
+export const examDetailResponseSchema = z.object({
+  exam: examSchema,
+  questions: z.array(examPublicQuestionSchema),
+});
+
+export const examAttemptSchema = z.object({
+  id: z.string().min(1),
+  examId: z.string().min(1),
+  startedAt: z.string().min(1),
+  submittedAt: z.string().nullable(),
+  score: z.number().int().nullable(),
+  maxScore: z.number().int().nonnegative(),
+});
+
+export const startExamAttemptResponseSchema = z.object({
+  attempt: examAttemptSchema,
+  exam: examSchema,
+  questions: z.array(examPublicQuestionSchema),
+});
+
+export const submitExamAttemptInputSchema = z.object({
+  answers: z.record(z.string(), z.string()),
+});
+export type SubmitExamAttemptInput = z.infer<typeof submitExamAttemptInputSchema>;
+
+export const submitExamAttemptResponseSchema = z.object({
+  attempt: examAttemptSchema,
+  percentage: z.number().nonnegative(),
+  results: z.array(
+    z.object({
+      questionId: z.string().min(1),
+      correct: z.boolean(),
+      expectedAnswer: z.string().min(1),
+      points: z.number().int().positive(),
+    }),
+  ),
+});
+
+export const gradeEntrySchema = z.object({
+  examId: z.string().min(1),
+  examTitle: z.string().min(1),
+  score: z.number().int().nonnegative(),
+  maxScore: z.number().int().positive(),
+  percentage: z.number().nonnegative(),
+  submittedAt: z.string().min(1),
+});
+export type GradeEntry = z.infer<typeof gradeEntrySchema>;
+
+export const gradesResponseSchema = z.object({
+  grades: z.array(gradeEntrySchema),
+  averagePercentage: z.number().nonnegative(),
+});
+
+export const masteryItemSchema = z.object({
+  questionId: z.string().min(1),
+  prompt: z.string().min(1),
+  attempts: z.number().int().nonnegative(),
+  correct: z.number().int().nonnegative(),
+  accuracy: z.number().nonnegative(),
+});
+export const masteryResponseSchema = z.object({ items: z.array(masteryItemSchema) });
+
+export const searchResponseSchema = z.object({
+  notes: z.array(z.object({ id: z.string().min(1), title: z.string().min(1) })),
+  questions: z.array(z.object({ id: z.string().min(1), prompt: z.string().min(1) })),
+});
+
+export const pdfAnnotationSchema = z.object({
+  id: z.string().min(1),
+  fileId: z.string().min(1),
+  page: z.number().int().positive(),
+  rect: z.string().nullable(),
+  note: z.string().nullable(),
+  color: z.string().min(1),
+  createdAt: z.string().min(1),
+});
+export const createPdfAnnotationInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  fileId: z.string().uuid(),
+  page: z.number().int().min(1).max(5000),
+  rect: z.string().max(500).nullish(),
+  note: z.string().max(2000).nullish(),
+  color: z.string().max(30).optional(),
+});
+export const pdfAnnotationListResponseSchema = z.object({
+  annotations: z.array(pdfAnnotationSchema),
+});
