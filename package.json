@@ -20,6 +20,7 @@
     "format:check": "prettier --check .",
     "db:up": "docker compose -f infra/docker/docker-compose.yml up -d",
     "db:down": "docker compose -f infra/docker/docker-compose.yml down",
+    "db:migrate": "pnpm --filter @study-os/db db:migrate",
     "check:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-windows.ps1",
     "verify:db": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-db.ps1"
   },

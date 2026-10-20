@@ -7,5 +7,5 @@ export default defineConfig({
   platform: "node",
   sourcemap: true,
   clean: true,
-  noExternal: ["@study-os/contracts"],
+  noExternal: ["@study-os/contracts", "@study-os/db"],
 });

@@ -13,6 +13,8 @@ const config: ApiConfig = {
   logLevel: "silent",
   corsOrigins: [],
   databaseUrl,
+  sessionSecret: "test-session-secret",
+  secureCookies: false,
   version: "0.1.0",
 };
 

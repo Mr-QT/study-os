@@ -7,9 +7,12 @@
 | [0001](0001-monorepo-and-package-manager.md) | Monorepo 与包管理器（pnpm workspaces） | Proposed | 是 |
 | [0002](0002-runtime-versions.md) | 运行时与框架版本基线 | Proposed | 是 |
 | [0003](0003-api-framework.md) | API 框架与错误/健康检查约定（Fastify 5） | Proposed | 是 |
-| [0004](0004-data-layer-pending.md) | 数据层（PostgreSQL + ORM 待定） | Proposed | 是 |
+| [0004](0004-data-layer-pending.md) | 数据层（PostgreSQL + ORM 待定） | Superseded by 0007 | 否 |
 | [0005](0005-i18n.md) | i18n 与本地化路由 | Proposed | 是 |
 | [0006](0006-deferred-infrastructure.md) | 阶段 1 前待定的基础设施选型 | Proposed | 是 |
+| [0007](0007-drizzle-orm.md) | 数据访问层（Drizzle ORM + SQL 迁移） | Proposed（已实现） | 是 |
+| [0008](0008-guest-session.md) | 本地访客身份与签名 Cookie 会话 | Proposed（已实现） | 是 |
+| [0009](0009-indexeddb-cache.md) | IndexedDB 空间缓存（Dexie） | Proposed（已实现） | 是 |
 
 ## 状态说明
 

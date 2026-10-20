@@ -1,4 +1,4 @@
-﻿# Verify PostgreSQL via Docker Compose and run DB integration tests.
+# Verify PostgreSQL via Docker Compose and run DB integration tests.
 # Usage: pnpm verify:db
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
@@ -25,6 +25,10 @@ for ($i = 0; $i -lt 40; $i++) {
 if (-not $healthy) { throw "postgres container did not become healthy in time" }
 
 $env:DATABASE_URL = "postgres://studyos:studyos@127.0.0.1:5432/studyos"
+Write-Host "== applying migrations ==" -ForegroundColor Cyan
+pnpm --filter @study-os/db db:migrate
+if ($LASTEXITCODE -ne 0) { throw "database migrations failed" }
+
 Write-Host "== running API tests against real PostgreSQL ==" -ForegroundColor Cyan
 pnpm --filter @study-os/api test
 if ($LASTEXITCODE -ne 0) { throw "database integration tests failed" }

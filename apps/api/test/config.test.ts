@@ -9,6 +9,8 @@ describe("loadConfig", () => {
     expect(config.port).toBe(4000);
     expect(config.databaseUrl).toBeUndefined();
     expect(config.corsOrigins).toEqual(["http://localhost:3000", "http://127.0.0.1:3000"]);
+    expect(config.secureCookies).toBe(false);
+    expect(config.sessionSecret.length).toBeGreaterThan(0);
   });
 
   it("accepts port 0 for ephemeral test servers", () => {
@@ -20,8 +22,18 @@ describe("loadConfig", () => {
     expect(() => loadConfig({ API_PORT: "70000" })).toThrow(/API_PORT/);
   });
 
-  it("does not ship development CORS origins in production", () => {
-    expect(loadConfig({ NODE_ENV: "production" }).corsOrigins).toEqual([]);
+  it("requires a strong session secret in production", () => {
+    expect(() => loadConfig({ NODE_ENV: "production" })).toThrow(/SESSION_SECRET/);
+    expect(() =>
+      loadConfig({ NODE_ENV: "production", SESSION_SECRET: "too-short" }),
+    ).toThrow(/SESSION_SECRET/);
+
+    const config = loadConfig({
+      NODE_ENV: "production",
+      SESSION_SECRET: "a-production-grade-secret-value",
+    });
+    expect(config.secureCookies).toBe(true);
+    expect(config.corsOrigins).toEqual([]);
   });
 
   it("parses a comma separated origin list", () => {

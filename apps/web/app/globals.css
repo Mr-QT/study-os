@@ -1,30 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --canvas: #f5f4f0;
+  --canvas: #fafafc;
   --surface: #ffffff;
-  --ink: #1f2421;
-  --muted: #646b66;
-  --accent: #3f6f63;
-  --accent-soft: #e4ede9;
-  --line: #e2e0da;
-  --warn: #9a6224;
-  --danger: #9c3b3b;
-  --ok: #2f6b4f;
+  --ink: #242636;
+  --muted: #62677a;
+  --accent: #8275d6;
+  --accent-ink: #574ba8;
+  --accent-soft: #efedfb;
+  --line: #e7e7ef;
+  --warn: #a4632a;
+  --danger: #b4453f;
+  --ok: #2f7a5a;
+  --mint: #b6dcd0;
+  --peach: #f5d7ce;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --canvas: #141817;
-    --surface: #1b211f;
-    --ink: #eceeeb;
-    --muted: #a2aaa4;
-    --accent: #8ec2b0;
-    --accent-soft: #233630;
-    --line: #2c3431;
+    --canvas: #16161f;
+    --surface: #1e1e2a;
+    --ink: #ececf4;
+    --muted: #a3a7b9;
+    --accent: #a99bea;
+    --accent-ink: #cfc6f7;
+    --accent-soft: #2a2742;
+    --line: #2e2e3d;
     --warn: #e0b072;
     --danger: #e59090;
     --ok: #8fd3ad;
+    --mint: #2f4a43;
+    --peach: #4a3730;
   }
 }
 
@@ -34,11 +40,14 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
   --color-accent-soft: var(--accent-soft);
   --color-line: var(--line);
   --color-warn: var(--warn);
   --color-danger: var(--danger);
   --color-ok: var(--ok);
+  --color-mint: var(--mint);
+  --color-peach: var(--peach);
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei",
     "PingFang SC", sans-serif;
 }

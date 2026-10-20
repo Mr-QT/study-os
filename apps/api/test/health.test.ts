@@ -16,6 +16,8 @@ const config: ApiConfig = {
   logLevel: "silent",
   corsOrigins: ["http://localhost:3000"],
   databaseUrl: undefined,
+  sessionSecret: "test-session-secret",
+  secureCookies: false,
   version: "0.1.0",
 };
 
@@ -62,7 +64,14 @@ describe("errors", () => {
     const response = await app.inject({ method: "GET", url: "/does-not-exist" });
     expect(response.statusCode).toBe(404);
     const body = apiErrorSchema.parse(response.json());
-    expect(body.error.code).toBe("NOT_FOUND");
+    expect(body.code).toBe("NOT_FOUND");
+    expect(body.correlationId).toBeTruthy();
+  });
+
+  it("returns 503 for data endpoints without a database", async () => {
+    const response = await app.inject({ method: "GET", url: "/api/v1/spaces" });
+    expect(response.statusCode).toBe(503);
+    expect(apiErrorSchema.parse(response.json()).code).toBe("SERVICE_UNAVAILABLE");
   });
 });
 

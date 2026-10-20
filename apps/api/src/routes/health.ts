@@ -10,14 +10,13 @@ import { checkDatabase } from "../db";
 
 export interface HealthRouteOptions {
   version: string;
-  databaseUrl: string | undefined;
 }
 
 export const healthRoutes: FastifyPluginAsync<HealthRouteOptions> = async (app, options) => {
   const startedAt = Date.now();
 
   app.get("/health", async () => {
-    const database = await checkDatabase(options.databaseUrl);
+    const database = await checkDatabase(app.database);
     return healthResponseSchema.parse({
       status: database === "error" ? "degraded" : "ok",
       service: API_SERVICE_NAME,
@@ -29,7 +28,7 @@ export const healthRoutes: FastifyPluginAsync<HealthRouteOptions> = async (app, 
   });
 
   app.get("/ready", async (_request, reply) => {
-    const database = await checkDatabase(options.databaseUrl);
+    const database = await checkDatabase(app.database);
     const ready = database !== "error";
     const body = readinessResponseSchema.parse({
       status: ready ? "ready" : "not_ready",

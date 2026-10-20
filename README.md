@@ -1,7 +1,7 @@
 # Study OS — 个人 AI 学习工作台
 
 > 产品定位：个人优先、轻量协作、AI 驱动、本地优先且可云端同步的长期学习操作系统。
-> 当前状态：**阶段 0 工程骨架**已搭建并通过本地验证；学习空间、任务、课程等业务功能**尚未实现**（`PLANNED`）。
+> 当前状态：**阶段 1 里程碑 1.1** 已完成——访客身份、学习空间、Drizzle 迁移与 IndexedDB 缓存；课程、任务、笔记等仍未实现（`PLANNED`）。
 
 ## 快速开始（Windows）
 
@@ -9,12 +9,15 @@
 
 ```powershell
 pnpm install
+pnpm db:up          # 需要 Docker Desktop；或使用任意 PostgreSQL 16 实例
+$env:DATABASE_URL="postgres://studyos:studyos@127.0.0.1:5432/studyos"
+pnpm db:migrate
 pnpm dev
 ```
 
-- Web：http://localhost:3000（自动跳转 `/zh-CN`，可切换 `/en`）
+- Web：http://127.0.0.1:3000（自动跳转 `/zh-CN`，可切换 `/en`）
 - API：http://127.0.0.1:4000/health、http://127.0.0.1:4000/ready
-- 未配置 `DATABASE_URL` 时，状态页显示「未配置（本地模式）」，服务不会崩溃。
+- 未配置 `DATABASE_URL` 时，页面仍可打开，空间接口返回 503 并显示「数据库未配置」。
 - 可选：复制 `.env.example` 为 `.env`，API 会自动加载（真实进程环境变量优先）。
 
 ### 质量命令
@@ -27,17 +30,19 @@ pnpm dev
 | `pnpm build` | API 打包（tsup）+ Web 生产构建 |
 | `pnpm test:e2e` | Playwright smoke，自动拉起 API/Web |
 | `pnpm db:up` / `pnpm db:down` | 本地 PostgreSQL（需 Docker Desktop） |
-| `pnpm verify:db` | 启动容器并跑真实数据库集成测试（重启后使用） |
+| `pnpm db:migrate` | 应用 SQL 迁移（需要 `DATABASE_URL`） |
+| `pnpm verify:db` | 启动容器、迁移并跑真实数据库集成测试（重启后使用） |
 
 ### 仓库结构
 
 ```text
-apps/web              Next.js 16 PWA（中英双语路由、状态页）
-apps/api              Fastify 5 模块化单体（/health、/ready）
-packages/contracts    Zod 共享契约
+apps/web              Next.js 16 PWA（学习空间工作台、中英双语、Dexie 缓存）
+apps/api              Fastify 5 模块化单体（/health、/api/v1/auth、/api/v1/spaces）
+packages/contracts    Zod 共享契约与 DTO
+packages/db           Drizzle schema 与 SQL 迁移
 docs/adr              架构决策记录（Proposed，待批准）
 infra/docker          PostgreSQL Compose
-tests/e2e             Playwright smoke
+tests/e2e             Playwright（工作台、axe、多视口）
 ```
 
 ## 文档索引

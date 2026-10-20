@@ -1,6 +1,6 @@
 # ADR-0004：数据层（PostgreSQL + ORM）— 待验证
 
-- 状态：Proposed（未验证，不得视为已决定）
+- 状态：Superseded by [ADR-0007](0007-drizzle-orm.md)（PostgreSQL 决定保留，ORM 已选定 Drizzle）
 - 日期：2026-10-19
 - 影响范围：数据库、迁移、同步、备份
 - 背景与问题：启动包要求 PostgreSQL（云端/自托管）+ IndexedDB（本地）。阶段 0 需要给出可运行的最小数据层，但 ORM 与迁移工具尚未实测。
