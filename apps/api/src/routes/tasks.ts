@@ -17,6 +17,7 @@ import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess } from "../auth/space-access";
 import { toTaskDto } from "../dto";
 import { forbidden, notFound, sendError, validationError } from "../http/errors";
+import { recordChange } from "../sync/record";
 
 async function authorize(
   db: Db,
@@ -100,6 +101,14 @@ export const taskRoutes: FastifyPluginAsync = async (app) => {
       })
       .returning();
     if (!task) return reply;
+    await recordChange(database.db, {
+      userId: user.id,
+      spaceId: task.spaceId,
+      entityType: "task",
+      entityId: task.id,
+      operation: "create",
+      version: task.version,
+    });
     return reply.code(201).send(taskResponseSchema.parse({ task: toTaskDto(task) }));
   });
 
@@ -188,6 +197,14 @@ export const taskRoutes: FastifyPluginAsync = async (app) => {
       .where(eq(tasks.id, existing.id))
       .returning();
     if (!updated) return notFound(reply);
+    await recordChange(database.db, {
+      userId: user.id,
+      spaceId: updated.spaceId,
+      entityType: "task",
+      entityId: updated.id,
+      operation: "update",
+      version: updated.version,
+    });
     return taskResponseSchema.parse({ task: toTaskDto(updated) });
   });
 
@@ -214,6 +231,14 @@ export const taskRoutes: FastifyPluginAsync = async (app) => {
       .update(tasks)
       .set({ deletedAt: new Date(), updatedAt: new Date(), version: existing.version + 1 })
       .where(eq(tasks.id, existing.id));
+    await recordChange(database.db, {
+      userId: user.id,
+      spaceId: existing.spaceId,
+      entityType: "task",
+      entityId: existing.id,
+      operation: "delete",
+      version: existing.version + 1,
+    });
     return reply.code(204).send();
   });
 };

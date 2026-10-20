@@ -4,9 +4,11 @@ import type { CalendarEventDto, CourseDto, SpaceDto, TaskDto } from "@study-os/c
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { AiPanel } from "@/components/ai-panel";
 import { FilesPanel } from "@/components/files-panel";
 import { FocusPanel } from "@/components/focus-panel";
 import { NotesPanel } from "@/components/notes-panel";
+import { StatsPanel } from "@/components/stats-panel";
 
 import {
   CALENDAR_EVENTS_ENDPOINT,
@@ -70,6 +72,22 @@ export interface SpaceLabels {
   fileSelect: string;
   fileDelete: string;
   fileHint: string;
+  statsTitle: string;
+  statsCourses: string;
+  statsTasks: string;
+  statsDone: string;
+  statsNotes: string;
+  statsFiles: string;
+  statsFocus: string;
+  aiTitle: string;
+  aiDisabled: string;
+  aiPlaceholder: string;
+  aiGenerate: string;
+  aiGenerating: string;
+  aiBudget: string;
+  aiRemaining: string;
+  aiError: string;
+  aiPrivacyNote: string;
 }
 
 const jsonHeaders = { "content-type": "application/json", accept: "application/json" };
@@ -494,6 +512,33 @@ export function SpaceWorkspace({
           selectFile: labels.fileSelect,
           remove: labels.fileDelete,
           hint: labels.fileHint,
+        }}
+      />
+      <StatsPanel
+        spaceId={spaceId}
+        labels={{
+          title: labels.statsTitle,
+          courses: labels.statsCourses,
+          tasks: labels.statsTasks,
+          done: labels.statsDone,
+          notes: labels.statsNotes,
+          files: labels.statsFiles,
+          focus: labels.statsFocus,
+        }}
+      />
+
+      <AiPanel
+        spaceId={spaceId}
+        labels={{
+          title: labels.aiTitle,
+          disabled: labels.aiDisabled,
+          placeholder: labels.aiPlaceholder,
+          generate: labels.aiGenerate,
+          generating: labels.aiGenerating,
+          budget: labels.aiBudget,
+          remaining: labels.aiRemaining,
+          error: labels.aiError,
+          privacyNote: labels.aiPrivacyNote,
         }}
       />
     </div>

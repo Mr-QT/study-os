@@ -17,6 +17,7 @@ import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess } from "../auth/space-access";
 import { toNoteDto } from "../dto";
 import { notFound, sendError, validationError } from "../http/errors";
+import { recordChange } from "../sync/record";
 
 async function authorize(
   db: Db,
@@ -90,6 +91,14 @@ export const noteRoutes: FastifyPluginAsync = async (app) => {
       })
       .returning();
     if (!note) return reply;
+    await recordChange(database.db, {
+      userId: user.id,
+      spaceId: note.spaceId,
+      entityType: "note",
+      entityId: note.id,
+      operation: "create",
+      version: note.version,
+    });
     return reply.code(201).send(noteResponseSchema.parse({ note: toNoteDto(note) }));
   });
 
@@ -155,6 +164,14 @@ export const noteRoutes: FastifyPluginAsync = async (app) => {
       .where(eq(notes.id, existing.id))
       .returning();
     if (!updated) return notFound(reply);
+    await recordChange(database.db, {
+      userId: user.id,
+      spaceId: updated.spaceId,
+      entityType: "note",
+      entityId: updated.id,
+      operation: "update",
+      version: updated.version,
+    });
     return noteResponseSchema.parse({ note: toNoteDto(updated) });
   });
 
@@ -181,6 +198,14 @@ export const noteRoutes: FastifyPluginAsync = async (app) => {
       .update(notes)
       .set({ deletedAt: new Date(), updatedAt: new Date(), version: existing.version + 1 })
       .where(eq(notes.id, existing.id));
+    await recordChange(database.db, {
+      userId: user.id,
+      spaceId: existing.spaceId,
+      entityType: "note",
+      entityId: existing.id,
+      operation: "delete",
+      version: existing.version + 1,
+    });
     return reply.code(204).send();
   });
 };

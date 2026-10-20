@@ -386,3 +386,117 @@ export const learningLogResponseSchema = z.object({
   days: z.array(learningLogDaySchema),
 });
 export type LearningLogResponse = z.infer<typeof learningLogResponseSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Milestone 1.4 contracts: AI gateway                                 */
+/* ------------------------------------------------------------------ */
+
+export const aiPurposeSchema = z.enum(["study_plan", "explain"]);
+export type AiPurpose = z.infer<typeof aiPurposeSchema>;
+
+export const aiErrorCodes = {
+  privacyDenied: "PRIVACY_DENIED",
+  budgetExceeded: "BUDGET_EXCEEDED",
+} as const;
+
+export const aiStatusResponseSchema = z.object({
+  enabled: z.boolean(),
+  provider: z.string().min(1),
+  model: z.string().min(1),
+  budgetUsd: z.number().nonnegative(),
+  spentUsd: z.number().nonnegative(),
+  remainingUsd: z.number().nonnegative(),
+});
+export type AiStatusResponse = z.infer<typeof aiStatusResponseSchema>;
+
+export const aiRequestInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  purpose: aiPurposeSchema,
+  input: z.string().trim().min(1).max(4000),
+});
+export type AiRequestInput = z.infer<typeof aiRequestInputSchema>;
+
+export const aiRequestResponseSchema = z.object({
+  invocationId: z.string().min(1),
+  text: z.string(),
+  provider: z.string().min(1),
+  model: z.string().min(1),
+  usage: z.object({
+    promptChars: z.number().int().nonnegative(),
+    completionChars: z.number().int().nonnegative(),
+  }),
+});
+export type AiRequestResponse = z.infer<typeof aiRequestResponseSchema>;
+
+export const aiUsageResponseSchema = z.object({
+  budgetUsd: z.number().nonnegative(),
+  spentUsd: z.number().nonnegative(),
+  calls: z.number().int().nonnegative(),
+});
+export type AiUsageResponse = z.infer<typeof aiUsageResponseSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Milestone 1.5 contracts: sync and stats                             */
+/* ------------------------------------------------------------------ */
+
+export const syncEntityTypeSchema = z.enum(["task", "note"]);
+export type SyncEntityType = z.infer<typeof syncEntityTypeSchema>;
+
+export const syncOperationSchema = z.object({
+  opId: z.string().uuid(),
+  entityType: syncEntityTypeSchema,
+  entityId: z.string().uuid(),
+  action: z.enum(["patch", "delete"]),
+  patch: z.record(z.string(), z.unknown()).default({}),
+  baseVersion: z.number().int().positive().optional(),
+});
+export type SyncOperation = z.infer<typeof syncOperationSchema>;
+
+export const syncPushInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  deviceId: z.string().max(100).optional(),
+  operations: z.array(syncOperationSchema).min(1).max(100),
+});
+export type SyncPushInput = z.infer<typeof syncPushInputSchema>;
+
+export const syncPushResultSchema = z.object({
+  results: z.array(
+    z.object({
+      opId: z.string().min(1),
+      status: z.enum(["accepted", "conflict", "rejected"]),
+      version: z.number().int().optional(),
+      reason: z.string().optional(),
+    }),
+  ),
+});
+export type SyncPushResult = z.infer<typeof syncPushResultSchema>;
+
+export const syncChangeSchema = z.object({
+  cursor: z.number().int().nonnegative(),
+  entityType: syncEntityTypeSchema,
+  entityId: z.string().min(1),
+  operation: z.string().min(1),
+  version: z.number().int().nullable(),
+  createdAt: z.string().min(1),
+});
+export type SyncChangeDto = z.infer<typeof syncChangeSchema>;
+
+export const syncPullResponseSchema = z.object({
+  changes: z.array(syncChangeSchema),
+  nextCursor: z.number().int().nonnegative(),
+  hasMore: z.boolean(),
+});
+export type SyncPullResponse = z.infer<typeof syncPullResponseSchema>;
+
+export const statsResponseSchema = z.object({
+  counts: z.object({
+    spaces: z.number().int().nonnegative(),
+    courses: z.number().int().nonnegative(),
+    tasks: z.number().int().nonnegative(),
+    tasksDone: z.number().int().nonnegative(),
+    notes: z.number().int().nonnegative(),
+    files: z.number().int().nonnegative(),
+    focusMinutes7d: z.number().int().nonnegative(),
+  }),
+});
+export type StatsResponse = z.infer<typeof statsResponseSchema>;

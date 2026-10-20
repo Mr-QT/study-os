@@ -10,6 +10,9 @@ export const NOTES_ENDPOINT = `${API_BASE_URL}/api/v1/notes`;
 export const FOCUS_ENDPOINT = `${API_BASE_URL}/api/v1/focus/sessions`;
 export const FILES_ENDPOINT = `${API_BASE_URL}/api/v1/files`;
 export const LEARNING_LOG_ENDPOINT = `${API_BASE_URL}/api/v1/learning-logs`;
+export const AI_STATUS_ENDPOINT = `${API_BASE_URL}/api/v1/ai/status`;
+export const AI_REQUESTS_ENDPOINT = `${API_BASE_URL}/api/v1/ai/requests`;
+export const STATS_ENDPOINT = `${API_BASE_URL}/api/v1/stats`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -65,4 +68,8 @@ export function fileEndpoint(fileId: string): string {
 
 export function learningLogEndpoint(spaceId: string, days = 7): string {
   return `${LEARNING_LOG_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}&days=${days}`;
+}
+
+export function statsEndpoint(spaceId: string): string {
+  return `${STATS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
 }

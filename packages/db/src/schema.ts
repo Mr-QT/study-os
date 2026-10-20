@@ -6,6 +6,7 @@ import {
   pgEnum,
   pgTable,
   primaryKey,
+  serial,
   text,
   timestamp,
   uuid,
@@ -233,6 +234,58 @@ export const fileAssets = pgTable(
   ],
 );
 
+export const aiInvocationStatusEnum = pgEnum("ai_invocation_status", ["ok", "error", "blocked"]);
+
+export const aiInvocations = pgTable(
+  "ai_invocations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    purpose: text("purpose").notNull(),
+    provider: text("provider").notNull(),
+    model: text("model").notNull(),
+    promptChars: integer("prompt_chars").notNull().default(0),
+    completionChars: integer("completion_chars").notNull().default(0),
+    estimatedCostMicros: integer("estimated_cost_micros").notNull().default(0),
+    status: aiInvocationStatusEnum("status").notNull().default("ok"),
+    errorCode: text("error_code"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("ai_invocations_user_idx").on(table.userId),
+    index("ai_invocations_space_idx").on(table.spaceId),
+    index("ai_invocations_created_idx").on(table.createdAt),
+  ],
+);
+
+/** Append-only change log used by the incremental sync protocol. */
+export const syncChanges = pgTable(
+  "sync_changes",
+  {
+    id: serial("id").primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    entityType: text("entity_type").notNull(),
+    entityId: uuid("entity_id").notNull(),
+    operation: text("operation").notNull(),
+    version: integer("version"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("sync_changes_space_idx").on(table.spaceId, table.id),
+    index("sync_changes_user_idx").on(table.userId),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -245,3 +298,5 @@ export type CalendarEventRow = typeof calendarEvents.$inferSelect;
 export type NoteRow = typeof notes.$inferSelect;
 export type FocusSessionRow = typeof focusSessions.$inferSelect;
 export type FileAssetRow = typeof fileAssets.$inferSelect;
+export type AiInvocationRow = typeof aiInvocations.$inferSelect;
+export type SyncChangeRow = typeof syncChanges.$inferSelect;

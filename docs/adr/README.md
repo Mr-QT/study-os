@@ -15,6 +15,8 @@
 | [0009](0009-indexeddb-cache.md) | IndexedDB 空间缓存（Dexie） | Proposed（已实现） | 是 |
 | [0010](0010-optimistic-concurrency.md) | 任务更新的乐观并发（version + 409） | Proposed（已实现） | 是 |
 | [0011](0011-local-file-storage.md) | 本地文件存储（磁盘 + 元数据表） | Proposed（已实现） | 是 |
+| [0012](0012-ai-gateway.md) | AI 网关（默认关闭、预算与隐私前置） | Proposed（已实现） | 是 |
+| [0013](0013-incremental-sync.md) | 增量同步（变更日志 + push/pull） | Proposed（部分实现） | 是 |
 
 ## 状态说明
 

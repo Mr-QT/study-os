@@ -9,9 +9,11 @@ import Fastify, {
 
 import { apiErrorCodes } from "@study-os/contracts";
 
+import { createAiProvider, type AiProvider } from "./ai/provider";
 import type { ApiConfig } from "./config";
 import { openDatabase } from "./db";
 import { sendError } from "./http/errors";
+import { aiRoutes } from "./routes/ai";
 import { authRoutes } from "./routes/auth";
 import { calendarRoutes } from "./routes/calendar";
 import { learningRoutes } from "./routes/courses";
@@ -21,11 +23,18 @@ import { healthRoutes } from "./routes/health";
 import { learningLogRoutes } from "./routes/learning-log";
 import { noteRoutes } from "./routes/notes";
 import { spaceRoutes } from "./routes/spaces";
+import { statsRoutes } from "./routes/stats";
+import { syncRoutes } from "./routes/sync";
 import { taskRoutes } from "./routes/tasks";
+
+export interface AppDependencies {
+  aiProvider?: AiProvider | null;
+}
 
 export async function buildApp(
   config: ApiConfig,
   options: FastifyServerOptions = {},
+  deps: AppDependencies = {},
 ): Promise<FastifyInstance> {
   const app = Fastify({
     logger: {
@@ -75,6 +84,11 @@ export async function buildApp(
   });
 
   await app.register(healthRoutes, { version: config.version });
+  await app.register(aiRoutes, {
+    provider: deps.aiProvider === undefined ? createAiProvider(config) : deps.aiProvider,
+    budgetUsd: config.aiBudgetUsd ?? 5,
+    costPer1kUsd: config.aiCostPer1kUsd ?? 0.002,
+  });
   await app.register(authRoutes, { secureCookies: config.secureCookies });
   await app.register(spaceRoutes);
   await app.register(learningRoutes);
@@ -84,6 +98,8 @@ export async function buildApp(
   await app.register(focusRoutes);
   await app.register(fileRoutes, { storageDir: config.storageDir });
   await app.register(learningLogRoutes);
+  await app.register(syncRoutes);
+  await app.register(statsRoutes);
 
   return app;
 }

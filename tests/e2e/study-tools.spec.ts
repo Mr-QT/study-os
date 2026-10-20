@@ -15,6 +15,9 @@ test.describe("Study OS notes, focus and files", () => {
     await page.getByRole("link", { name: new RegExp(spaceName) }).click();
     await expect(page).toHaveURL(/\/spaces\/[0-9a-f-]+$/);
 
+    await expect(page.getByRole("heading", { level: 3, name: "学习统计" })).toBeVisible();
+    await expect(page.getByText("AI 未配置")).toBeVisible();
+
     await page.getByLabel("笔记标题").fill(`极限笔记-${suffix}`);
     await page
       .getByLabel("用 Markdown 记录内容…")

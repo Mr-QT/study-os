@@ -9,6 +9,12 @@ export interface ApiConfig {
   sessionSecret: string;
   secureCookies: boolean;
   storageDir: string;
+  aiProvider?: string;
+  aiBaseUrl?: string;
+  aiApiKey?: string;
+  aiModel?: string;
+  aiBudgetUsd?: number;
+  aiCostPer1kUsd?: number;
   version: string;
 }
 
@@ -56,6 +62,18 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
     sessionSecret: parseSessionSecret(env.SESSION_SECRET, isProduction),
     secureCookies: isProduction,
     storageDir: env.STORAGE_DIR?.trim() || path.join(process.cwd(), "storage", "uploads"),
+    aiProvider: (env.AI_PROVIDER?.trim().toLowerCase() || "disabled"),
+    aiBaseUrl:
+      env.AI_BASE_URL?.trim() ||
+      ((env.AI_PROVIDER?.trim().toLowerCase() === "ollama")
+        ? "http://127.0.0.1:11434"
+        : "https://api.openai.com/v1"),
+    aiApiKey: env.AI_API_KEY?.trim() || undefined,
+    aiModel:
+      env.AI_MODEL?.trim() ||
+      ((env.AI_PROVIDER?.trim().toLowerCase() === "ollama") ? "llama3.1" : "gpt-4o-mini"),
+    aiBudgetUsd: Number(env.AI_MONTHLY_BUDGET_USD ?? "5"),
+    aiCostPer1kUsd: Number(env.AI_COST_PER_1K_USD ?? "0.002"),
     version: env.npm_package_version?.trim() || "0.1.0",
   };
 }
