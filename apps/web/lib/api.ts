@@ -23,6 +23,7 @@ export const PDF_ANNOTATIONS_ENDPOINT = `${API_BASE_URL}/api/v1/pdf-annotations`
 export const ANALYTICS_ENDPOINT = `${API_BASE_URL}/api/v1/analytics/overview`;
 export const MEMORIES_ENDPOINT = `${API_BASE_URL}/api/v1/memories`;
 export const TUTOR_ENDPOINT = `${API_BASE_URL}/api/v1/ai/tutor`;
+export const PLANS_ENDPOINT = `${API_BASE_URL}/api/v1/learning-plans`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -130,4 +131,12 @@ export function memoriesEndpoint(spaceId: string): string {
 
 export function memoryEndpoint(memoryId: string): string {
   return `${MEMORIES_ENDPOINT}/${memoryId}`;
+}
+
+export function plansListEndpoint(spaceId: string): string {
+  return `${PLANS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function planStepEndpoint(planId: string): string {
+  return `${PLANS_ENDPOINT}/${planId}/steps`;
 }

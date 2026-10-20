@@ -1,13 +1,13 @@
 # PROJECT_STATE — 真实项目状态
 
 - 日期：2026-10-20
-- 当前阶段：3 — 智能学习引擎
-- 当前里程碑：3.1 AI 记忆、学习分析/风险、导师答疑 — 完成
+- 当前阶段：3 — 智能学习引擎（完成）
+- 当前里程碑：3.1 记忆/分析/导师；3.2 多 Agent、学习计划、记忆提取、风险评分 — 完成
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 65 通过（contracts 10、api 55）；Playwright 12 通过
-- 数据库：PostgreSQL 16（Docker Compose，持久卷），21 张表，迁移 0000–0008
+- 测试结果：单元/集成 69 通过（contracts 10、api 59）；Playwright 12 通过
+- 数据库：PostgreSQL 16（Docker Compose，持久卷），22 张表，迁移 0000–0009
 - 部署状态：未部署
-- 最近 commit：`76b62a6`
+- 最近 commit：本次提交后更新
 
 ## 环境（实测）
 
@@ -26,31 +26,32 @@
 | 命令 | 结果 |
 |---|---|
 | `pnpm lint` / `typecheck` / `build` | 通过 |
-| `pnpm test` | 65 passed（contracts 10、api 55） |
+| `pnpm test` | 69 passed（contracts 10、api 59） |
 | `pnpm test:e2e` | 12 passed |
 | `pnpm verify:db` | 容器 healthy、迁移成功 |
 
 ## 已实现
 
-- 阶段 1 与 2：完整学习基础平台、题库/考试/复习、本地 RAG、PDF 查看与标注。
-- 3.1：
-  - **AI 记忆**：`ai_memories`，支持用户/空间/课程范围、事实/偏好/推断、置信度、固定、停用、过期与删除；按用户隔离。
-  - **学习分析与风险**：`/api/v1/analytics/overview` 汇总任务完成/逾期、近 7 天与上一周期专注分钟、考试平均分、薄弱题目，并生成风险码（overdue_tasks / low_focus / low_exam_score / weak_questions）。
-  - **导师答疑**：`POST /api/v1/ai/tutor`，苏格拉底式/直接解释两种模式；自动注入记忆与薄弱题目作为上下文；走同一预算、隐私、审计网关。
-  - Web：「学习洞察与导师」面板，显示统计/风险/薄弱题、管理记忆、向导师提问。
+- 阶段 1、2：完整学习平台、题库/考试/复习、本地 RAG、PDF 查看与标注。
+- 3.1：AI 记忆 CRUD、学习分析/风险、导师答疑（记忆+薄弱题注入）。
+- 3.2：
+  - **多 Agent 角色**：planner / tutor / examiner / analyst；`/api/v1/agents` 与 `/api/v1/agents/:role/run`，统一隐私/预算/审计（purpose=`agent:<role>`）。
+  - **学习计划/自适应教学**：`learning_plans`，planner 生成 JSON 步骤（诊断/学习/练习/复盘），失败回退内置模板；步骤可推进，全部完成自动置 completed。
+  - **记忆自动提取**：`POST /api/v1/memories/extract`，从对话文本提取事实/偏好/推断（最多 5 条）。
+  - **风险评分**：分析接口新增 0–100 `riskScore`（逾期、专注不足、考试偏低、薄弱题、专注下滑加权）。
+  - Web：空间页新增「学习计划」面板（生成计划、勾选步骤）；洞察面板显示风险分。
 
-## 未完成项（阶段 3 剩余）
+## 未完成项（跨阶段）
 
-- 多 Agent 编排（Planner/Tutor/Examiner/Analyst 角色分工与调度）。
-- 自适应教学路径（诊断→计划→练习→复盘的状态机）。
-- 从对话中自动提取/更新记忆（目前手动添加）。
-- 更复杂的风险预测（目前是规则阈值）。
-- 跨阶段：冲突合并 UI、账号/CSRF、对象存储、CI 远端运行。
+- Agent 目前是“角色提示词 + 上下文”，没有工具调用/多步自主执行。
+- 计划生成在 AI 失败时回退固定模板；未做完整诊断式自适应状态机。
+- 冲突合并 UI、账号/CSRF、对象存储、CI 远端运行。
+- 阶段 4（自动化/通知）及以后未开始。
 
 ## 下一步
 
-1. 用户验收 3.1。
-2. 继续 3.2：Agent 编排与自适应教学。
-3. 或转去补跨阶段项。
+1. 用户验收阶段 3。
+2. 进入阶段 4（自动化引擎、通知与多渠道调度）。
+3. 或先补跨阶段项（账号、冲突 UI、对象存储、CI）。
 
 > 每次修改都需附实际证据；禁止未经运行验证标记 DONE。

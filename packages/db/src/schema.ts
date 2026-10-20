@@ -491,6 +491,31 @@ export const aiMemories = pgTable(
   ],
 );
 
+export const planStatusEnum = pgEnum("plan_status", ["active", "completed", "archived"]);
+
+export const learningPlans = pgTable(
+  "learning_plans",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id").references(() => courses.id, { onDelete: "set null" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    goal: text("goal").notNull(),
+    status: planStatusEnum("status").notNull().default("active"),
+    steps: text("steps").notNull().default("[]"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("plans_space_idx").on(table.spaceId),
+    index("plans_user_idx").on(table.userId),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -514,3 +539,4 @@ export type ExamAttemptRow = typeof examAttempts.$inferSelect;
 export type PdfAnnotationRow = typeof pdfAnnotations.$inferSelect;
 export type KnowledgeChunkRow = typeof knowledgeChunks.$inferSelect;
 export type AiMemoryRow = typeof aiMemories.$inferSelect;
+export type LearningPlanRow = typeof learningPlans.$inferSelect;

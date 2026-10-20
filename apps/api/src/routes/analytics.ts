@@ -149,12 +149,24 @@ export const analyticsRoutes: FastifyPluginAsync = async (app) => {
     if (examPercentages.length > 0 && averagePercentage < 60) risks.push("low_exam_score");
     if (weakQuestions.length > 0) risks.push("weak_questions");
 
+    const riskScore = Math.min(
+      100,
+      Math.round(
+        Math.min(overdueTasks * 15, 45) +
+          (minutes7d < 60 ? 20 : 0) +
+          (examPercentages.length > 0 && averagePercentage < 60 ? 25 : 0) +
+          Math.min(weakQuestions.length * 8, 24) +
+          (minutesPrev7d > 0 && minutes7d < minutesPrev7d ? 10 : 0),
+      ),
+    );
+
     return analyticsOverviewSchema.parse({
       tasks: { total: totalTasks, done: doneTasks, overdue: overdueTasks },
       focus: { minutes7d, minutesPrev7d },
       exams: { attempts: examPercentages.length, averagePercentage },
       weakQuestions,
       risks,
+      riskScore,
     });
   });
 };

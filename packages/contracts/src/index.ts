@@ -777,6 +777,7 @@ export const analyticsOverviewSchema = z.object({
     }),
   ),
   risks: z.array(z.string()),
+  riskScore: z.number().min(0).max(100),
 });
 export type AnalyticsOverview = z.infer<typeof analyticsOverviewSchema>;
 
@@ -796,3 +797,76 @@ export const tutorResponseSchema = z.object({
   weakQuestionsUsed: z.number().int().nonnegative(),
 });
 export type TutorResponse = z.infer<typeof tutorResponseSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Stage 3.2: agents, learning plans, memory extraction                */
+/* ------------------------------------------------------------------ */
+
+export const agentRoleSchema = z.enum(["planner", "tutor", "examiner", "analyst"]);
+export type AgentRole = z.infer<typeof agentRoleSchema>;
+
+export const agentListResponseSchema = z.object({
+  agents: z.array(
+    z.object({
+      role: agentRoleSchema,
+      description: z.string().min(1),
+    }),
+  ),
+});
+
+export const agentRunInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  input: z.string().trim().min(1).max(3000),
+});
+export type AgentRunInput = z.infer<typeof agentRunInputSchema>;
+
+export const agentRunResponseSchema = z.object({
+  invocationId: z.string().min(1),
+  role: agentRoleSchema,
+  text: z.string(),
+  provider: z.string().min(1),
+  model: z.string().min(1),
+});
+
+export const planStepSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  type: z.enum(["diagnose", "study", "practice", "review"]),
+  status: z.enum(["pending", "in_progress", "done"]),
+});
+export type PlanStep = z.infer<typeof planStepSchema>;
+
+export const learningPlanSchema = z.object({
+  id: z.string().min(1),
+  spaceId: z.string().min(1),
+  courseId: z.string().nullable(),
+  goal: z.string().min(1),
+  status: z.enum(["active", "completed", "archived"]),
+  steps: z.array(planStepSchema),
+  createdAt: z.string().min(1),
+  updatedAt: z.string().min(1),
+});
+export type LearningPlanDto = z.infer<typeof learningPlanSchema>;
+
+export const createLearningPlanInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  courseId: z.string().uuid().nullish(),
+  goal: z.string().trim().min(1).max(1000),
+});
+export type CreateLearningPlanInput = z.infer<typeof createLearningPlanInputSchema>;
+
+export const updatePlanStepInputSchema = z.object({
+  stepId: z.string().min(1),
+  status: z.enum(["pending", "in_progress", "done"]),
+});
+
+export const planListResponseSchema = z.object({ plans: z.array(learningPlanSchema) });
+export const planResponseSchema = z.object({ plan: learningPlanSchema });
+
+export const extractMemoriesInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  text: z.string().trim().min(1).max(4000),
+});
+export const extractMemoriesResponseSchema = z.object({
+  memories: z.array(memorySchema),
+});
