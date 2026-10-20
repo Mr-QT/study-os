@@ -288,3 +288,101 @@ export const termResponseSchema = z.object({ term: termSchema });
 export const courseResponseSchema = z.object({ course: courseSchema });
 export const taskResponseSchema = z.object({ task: taskSchema });
 export const calendarEventResponseSchema = z.object({ event: calendarEventSchema });
+
+/* ------------------------------------------------------------------ */
+/* Milestone 1.3 contracts: notes, focus sessions, files, learning log */
+/* ------------------------------------------------------------------ */
+
+export const noteSourceSchema = z.enum(["user", "ai"]);
+export type NoteSource = z.infer<typeof noteSourceSchema>;
+
+export const noteSchema = z.object({
+  id: z.string().min(1),
+  spaceId: z.string().min(1),
+  courseId: z.string().nullable(),
+  title: z.string().min(1),
+  contentMd: z.string(),
+  sourceType: noteSourceSchema,
+  version: z.number().int().positive(),
+  createdAt: z.string().min(1),
+  updatedAt: z.string().min(1),
+});
+export type NoteDto = z.infer<typeof noteSchema>;
+
+export const createNoteInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  courseId: z.string().uuid().nullish(),
+  title: z.string().trim().min(1).max(200),
+  contentMd: z.string().max(50_000).optional(),
+});
+export type CreateNoteInput = z.infer<typeof createNoteInputSchema>;
+
+export const updateNoteInputSchema = z
+  .object({
+    title: z.string().trim().min(1).max(200).optional(),
+    contentMd: z.string().max(50_000).optional(),
+    courseId: z.string().uuid().nullable().optional(),
+    version: z.number().int().positive().optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, { message: "至少需要一个字段" });
+export type UpdateNoteInput = z.infer<typeof updateNoteInputSchema>;
+
+export const noteListResponseSchema = z.object({ notes: z.array(noteSchema) });
+export const noteResponseSchema = z.object({ note: noteSchema });
+
+export const focusSessionSchema = z.object({
+  id: z.string().min(1),
+  spaceId: z.string().min(1),
+  taskId: z.string().nullable(),
+  startedAt: z.string().min(1),
+  endedAt: z.string().nullable(),
+  durationSeconds: z.number().int().nullable(),
+  note: z.string().nullable(),
+  createdAt: z.string().min(1),
+});
+export type FocusSessionDto = z.infer<typeof focusSessionSchema>;
+
+export const startFocusInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  taskId: z.string().uuid().nullish(),
+  startedAt: isoDateTimeSchema.optional(),
+});
+export type StartFocusInput = z.infer<typeof startFocusInputSchema>;
+
+export const stopFocusInputSchema = z.object({
+  endedAt: isoDateTimeSchema.optional(),
+  note: z.string().max(2000).nullish(),
+});
+export type StopFocusInput = z.infer<typeof stopFocusInputSchema>;
+
+export const focusSessionListResponseSchema = z.object({
+  sessions: z.array(focusSessionSchema),
+});
+export const focusSessionResponseSchema = z.object({ session: focusSessionSchema });
+
+export const fileAssetSchema = z.object({
+  id: z.string().min(1),
+  spaceId: z.string().min(1),
+  noteId: z.string().nullable(),
+  name: z.string().min(1),
+  mime: z.string().min(1),
+  sizeBytes: z.number().int().nonnegative(),
+  sha256: z.string().min(1),
+  createdAt: z.string().min(1),
+});
+export type FileAssetDto = z.infer<typeof fileAssetSchema>;
+
+export const fileListResponseSchema = z.object({ files: z.array(fileAssetSchema) });
+export const fileResponseSchema = z.object({ file: fileAssetSchema });
+
+export const learningLogDaySchema = z.object({
+  date: z.string().min(1),
+  minutes: z.number().int().nonnegative(),
+  sessions: z.number().int().nonnegative(),
+});
+export type LearningLogDay = z.infer<typeof learningLogDaySchema>;
+
+export const learningLogResponseSchema = z.object({
+  days: z.array(learningLogDaySchema),
+});
+export type LearningLogResponse = z.infer<typeof learningLogResponseSchema>;

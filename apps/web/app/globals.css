@@ -60,6 +60,56 @@ body {
   font-family: var(--font-sans);
 }
 
+.markdown h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.35rem;
+}
+
+.markdown h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.6rem 0 0.3rem;
+}
+
+.markdown p {
+  margin: 0.35rem 0;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 0.35rem 0;
+  padding-left: 1.25rem;
+}
+
+.markdown ul {
+  list-style: disc;
+}
+
+.markdown ol {
+  list-style: decimal;
+}
+
+.markdown code {
+  border-radius: 0.35rem;
+  background: var(--accent-soft);
+  padding: 0.1rem 0.3rem;
+  font-size: 0.85em;
+}
+
+.markdown pre {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  background: var(--accent-soft);
+  padding: 0.75rem;
+}
+
+.markdown blockquote {
+  border-left: 3px solid var(--line);
+  padding-left: 0.75rem;
+  color: var(--muted);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

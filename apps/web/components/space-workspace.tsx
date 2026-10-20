@@ -4,6 +4,10 @@ import type { CalendarEventDto, CourseDto, SpaceDto, TaskDto } from "@study-os/c
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { FilesPanel } from "@/components/files-panel";
+import { FocusPanel } from "@/components/focus-panel";
+import { NotesPanel } from "@/components/notes-panel";
+
 import {
   CALENDAR_EVENTS_ENDPOINT,
   COURSES_ENDPOINT,
@@ -43,6 +47,29 @@ export interface SpaceLabels {
   eventCreate: string;
   eventCreating: string;
   eventInvalidRange: string;
+  notesTitle: string;
+  notesEmpty: string;
+  noteTitlePlaceholder: string;
+  noteContentPlaceholder: string;
+  noteCreate: string;
+  noteCreating: string;
+  noteDelete: string;
+  focusTitle: string;
+  focusStart: string;
+  focusStop: string;
+  focusRunning: string;
+  focusEmpty: string;
+  focusRecent: string;
+  focusLogTitle: string;
+  focusLogEmpty: string;
+  focusMinutes: string;
+  filesTitle: string;
+  filesEmpty: string;
+  fileUpload: string;
+  fileUploading: string;
+  fileSelect: string;
+  fileDelete: string;
+  fileHint: string;
 }
 
 const jsonHeaders = { "content-type": "application/json", accept: "application/json" };
@@ -428,6 +455,47 @@ export function SpaceWorkspace({
           </ul>
         )}
       </section>
+
+      <NotesPanel
+        spaceId={spaceId}
+        labels={{
+          title: labels.notesTitle,
+          empty: labels.notesEmpty,
+          titlePlaceholder: labels.noteTitlePlaceholder,
+          contentPlaceholder: labels.noteContentPlaceholder,
+          create: labels.noteCreate,
+          creating: labels.noteCreating,
+          remove: labels.noteDelete,
+        }}
+      />
+
+      <FocusPanel
+        spaceId={spaceId}
+        labels={{
+          title: labels.focusTitle,
+          start: labels.focusStart,
+          stop: labels.focusStop,
+          running: labels.focusRunning,
+          empty: labels.focusEmpty,
+          recent: labels.focusRecent,
+          logTitle: labels.focusLogTitle,
+          logEmpty: labels.focusLogEmpty,
+          minutes: labels.focusMinutes,
+        }}
+      />
+
+      <FilesPanel
+        spaceId={spaceId}
+        labels={{
+          title: labels.filesTitle,
+          empty: labels.filesEmpty,
+          upload: labels.fileUpload,
+          uploading: labels.fileUploading,
+          selectFile: labels.fileSelect,
+          remove: labels.fileDelete,
+          hint: labels.fileHint,
+        }}
+      />
     </div>
   );
 }

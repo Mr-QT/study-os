@@ -21,6 +21,9 @@ playwright-report/
 test-results/
 blob-report/
 
+# local uploads
+storage/
+
 # tooling caches
 .turbo/
 .eslintcache

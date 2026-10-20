@@ -26,6 +26,7 @@ const config: ApiConfig = {
   databaseUrl,
   sessionSecret: "test-session-secret",
   secureCookies: false,
+  storageDir: "test-storage",
   version: "0.1.0",
 };
 

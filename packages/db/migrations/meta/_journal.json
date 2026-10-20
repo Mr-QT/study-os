@@ -15,6 +15,20 @@
       "when": 1792495269064,
       "tag": "0001_messy_hardball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792495938342,
+      "tag": "0002_free_karma",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792495961438,
+      "tag": "0003_daily_shinko_yamashiro",
+      "breakpoints": true
     }
   ]
 }

@@ -1,3 +1,5 @@
+import path from "node:path";
+
 export interface ApiConfig {
   host: string;
   port: number;
@@ -6,6 +8,7 @@ export interface ApiConfig {
   databaseUrl: string | undefined;
   sessionSecret: string;
   secureCookies: boolean;
+  storageDir: string;
   version: string;
 }
 
@@ -52,6 +55,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
     databaseUrl: env.DATABASE_URL?.trim() || undefined,
     sessionSecret: parseSessionSecret(env.SESSION_SECRET, isProduction),
     secureCookies: isProduction,
+    storageDir: env.STORAGE_DIR?.trim() || path.join(process.cwd(), "storage", "uploads"),
     version: env.npm_package_version?.trim() || "0.1.0",
   };
 }

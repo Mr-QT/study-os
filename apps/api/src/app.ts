@@ -1,5 +1,6 @@
 import cors from "@fastify/cors";
 import cookie from "@fastify/cookie";
+import multipart from "@fastify/multipart";
 import Fastify, {
   type FastifyError,
   type FastifyInstance,
@@ -14,7 +15,11 @@ import { sendError } from "./http/errors";
 import { authRoutes } from "./routes/auth";
 import { calendarRoutes } from "./routes/calendar";
 import { learningRoutes } from "./routes/courses";
+import { fileRoutes } from "./routes/files";
+import { focusRoutes } from "./routes/focus";
 import { healthRoutes } from "./routes/health";
+import { learningLogRoutes } from "./routes/learning-log";
+import { noteRoutes } from "./routes/notes";
 import { spaceRoutes } from "./routes/spaces";
 import { taskRoutes } from "./routes/tasks";
 
@@ -44,6 +49,9 @@ export async function buildApp(
   await app.register(cookie, {
     secret: config.sessionSecret,
   });
+  await app.register(multipart, {
+    limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+  });
 
   app.setNotFoundHandler((request, reply) =>
     sendError(
@@ -72,6 +80,10 @@ export async function buildApp(
   await app.register(learningRoutes);
   await app.register(taskRoutes);
   await app.register(calendarRoutes);
+  await app.register(noteRoutes);
+  await app.register(focusRoutes);
+  await app.register(fileRoutes, { storageDir: config.storageDir });
+  await app.register(learningLogRoutes);
 
   return app;
 }

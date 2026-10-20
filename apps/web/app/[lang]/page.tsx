@@ -91,7 +91,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       </main>
 
       <footer className="text-xs text-muted">
-        {dict.appName} · Phase 1.2 · {new Date().getFullYear()}
+        {dict.appName} · Phase 1.3 · {new Date().getFullYear()}
       </footer>
     </div>
   );

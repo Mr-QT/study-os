@@ -1,6 +1,9 @@
 import type {
   CalendarEventDto,
   CourseDto,
+  FileAssetDto,
+  FocusSessionDto,
+  NoteDto,
   SpaceDto,
   TaskDto,
   TermDto,
@@ -9,6 +12,9 @@ import type {
 import type {
   CalendarEventRow,
   CourseRow,
+  FileAssetRow,
+  FocusSessionRow,
+  NoteRow,
   SpaceRow,
   TaskRow,
   TermRow,
@@ -81,8 +87,47 @@ export function toTaskDto(row: TaskRow): TaskDto {
   };
 }
 
-export function toCalendarEventDto(row: CalendarEventRow): CalendarEventDto {
+export function toNoteDto(row: NoteRow): NoteDto {
   return {
+    id: row.id,
+    spaceId: row.spaceId,
+    courseId: row.courseId,
+    title: row.title,
+    contentMd: row.contentMd,
+    sourceType: row.sourceType,
+    version: row.version,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+export function toFocusSessionDto(row: FocusSessionRow): FocusSessionDto {
+  return {
+    id: row.id,
+    spaceId: row.spaceId,
+    taskId: row.taskId,
+    startedAt: row.startedAt.toISOString(),
+    endedAt: row.endedAt?.toISOString() ?? null,
+    durationSeconds: row.durationSeconds,
+    note: row.note,
+    createdAt: row.createdAt.toISOString(),
+  };
+}
+
+export function toFileAssetDto(row: FileAssetRow): FileAssetDto {
+  return {
+    id: row.id,
+    spaceId: row.spaceId,
+    noteId: row.noteId,
+    name: row.name,
+    mime: row.mime,
+    sizeBytes: row.sizeBytes,
+    sha256: row.sha256,
+    createdAt: row.createdAt.toISOString(),
+  };
+}
+
+export function toCalendarEventDto(row: CalendarEventRow): CalendarEventDto {  return {
     id: row.id,
     spaceId: row.spaceId,
     title: row.title,

@@ -163,6 +163,76 @@ export const calendarEvents = pgTable(
   ],
 );
 
+export const noteSourceEnum = pgEnum("note_source", ["user", "ai"]);
+
+export const notes = pgTable(
+  "notes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id").references(() => courses.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    contentMd: text("content_md").notNull().default(""),
+    sourceType: noteSourceEnum("source_type").notNull().default("user"),
+    version: integer("version").notNull().default(1),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("notes_space_idx").on(table.spaceId),
+    index("notes_course_idx").on(table.courseId),
+  ],
+);
+
+export const focusSessions = pgTable(
+  "focus_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    taskId: uuid("task_id").references(() => tasks.id, { onDelete: "set null" }),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    endedAt: timestamp("ended_at", { withTimezone: true }),
+    durationSeconds: integer("duration_seconds"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("focus_space_idx").on(table.spaceId),
+    index("focus_user_idx").on(table.userId),
+    index("focus_started_idx").on(table.startedAt),
+  ],
+);
+
+export const fileAssets = pgTable(
+  "file_assets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    noteId: uuid("note_id").references(() => notes.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    mime: text("mime").notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    sha256: text("sha256").notNull(),
+    storageKey: text("storage_key").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("files_space_idx").on(table.spaceId),
+    index("files_sha_idx").on(table.sha256),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -172,3 +242,6 @@ export type TermRow = typeof terms.$inferSelect;
 export type CourseRow = typeof courses.$inferSelect;
 export type TaskRow = typeof tasks.$inferSelect;
 export type CalendarEventRow = typeof calendarEvents.$inferSelect;
+export type NoteRow = typeof notes.$inferSelect;
+export type FocusSessionRow = typeof focusSessions.$inferSelect;
+export type FileAssetRow = typeof fileAssets.$inferSelect;
