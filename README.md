@@ -9,16 +9,16 @@
 
 ```powershell
 pnpm install
-pnpm db:up          # 需要 Docker Desktop；或使用任意 PostgreSQL 16 实例
-$env:DATABASE_URL="postgres://studyos:studyos@127.0.0.1:5432/studyos"
+pnpm db:up          # Docker Desktop，PostgreSQL 16
 pnpm db:migrate
 pnpm dev
 ```
 
 - Web：http://127.0.0.1:3000（自动跳转 `/zh-CN`，可切换 `/en`）
 - API：http://127.0.0.1:4000/health、http://127.0.0.1:4000/ready
+- 根目录 `.env` 已配置 `DATABASE_URL`（本地，未提交）；新环境复制 `.env.example` 并填写。
 - 未配置 `DATABASE_URL` 时，页面仍可打开，空间接口返回 503 并显示「数据库未配置」。
-- 可选：复制 `.env.example` 为 `.env`，API 会自动加载（真实进程环境变量优先）。
+- 拉取镜像若超时，可配置镜像源或手动拉取后打 tag（本机使用 `docker.m.daocloud.io`）。
 
 ### 质量命令
 

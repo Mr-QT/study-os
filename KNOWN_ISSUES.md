@@ -2,8 +2,8 @@
 
 ## 环境
 
-- **WSL2 仍未生效**：Docker Desktop 已安装但引擎无法连接，Compose 未运行。
-- 本地数据库为临时便携版 PostgreSQL 16.14（端口 55432），重启后数据丢失。
+- Docker Desktop / WSL2 已可用（WSL 2.7.13、Engine 29.8.2）；PostgreSQL 容器通过 `pnpm db:up` 启动，数据保存在持久卷。
+- 当前网络直接访问 `docker.io` 会超时；镜像通过 `docker.m.daocloud.io` 拉取后打了本地 tag。新机器/清理镜像后需配置镜像源或手动拉取。
 - Python 只有 Microsoft Store 占位符，需要 FastAPI 时须安装真实 Python 3.12+。
 - Git / Node 在非默认路径，已写入用户 PATH。
 

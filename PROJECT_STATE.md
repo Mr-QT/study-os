@@ -7,7 +7,7 @@
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
 - 测试结果：单元/集成 49 通过（contracts 10、api 39）；Playwright 11 通过
 - 部署状态：未部署
-- 数据库：PostgreSQL 16.14（便携实例，端口 55432），12 张表，迁移 0000–0004 已应用
+- 数据库：PostgreSQL 16（Docker Compose，容器 `study-os-postgres`，持久卷 `studyos-pgdata`），12 张表，迁移 0000–0004 已应用
 - 已确认技术基线：见 `docs/adr/`（全部为 Proposed，待批准）
 - 最近 commit：`159ec8d`
 
@@ -21,9 +21,9 @@
 | Git | 2.55.0（`D:\Git`） |
 | Next.js / React | 16.4.2 / 19.3.1 |
 | Fastify / Zod / Drizzle | 5.12.7 / 4.6.7 / 见 lockfile |
-| PostgreSQL | 16.14（便携实例，端口 55432） |
+| PostgreSQL | 16-alpine（Docker Compose，端口 5432，持久卷） |
 | Playwright | 1.64.1 |
-| Docker Desktop | 4.95.0（已安装，WSL2 仍待真正重启） |
+| Docker Desktop | 4.95.0 / Engine 29.8.2；WSL 2.7.13 |
 
 ## 已验证命令与结果（2026-10-20）
 
@@ -34,6 +34,7 @@
 | `pnpm db:migrate` | 0000–0004 迁移成功 |
 | `pnpm test`（带 `DATABASE_URL`） | 49 passed（contracts 10、api 39） |
 | `pnpm test:e2e`（带数据库） | 11 passed（含离线 outbox 重放） |
+| `pnpm verify:db` | Docker Compose 容器 healthy、迁移成功、39 个 API 测试通过 |
 | `pnpm build` | API 打包与 Web 构建成功 |
 
 ## 已实现
@@ -57,13 +58,12 @@
 - AI 未配置真实密钥，未对真实提供方做受控 smoke test；仅用 stub 验证逻辑。
 - 自动化、插件、复习/考试、AI 记忆等后续阶段未开始。
 - 账号体系、设备撤销、CSRF token 未实现。
-- Docker Compose 仍未运行（WSL2 未真正重启）。
 - CI 尚未在 GitHub Actions 远端运行。
 
 ## 下一步
 
-1. 用户验收 1.4 与 1.5 的已完成部分（`docs/PHASE-1-M45-REPORT.md`）。
-2. 完成 1.5 剩余：Dexie outbox、离线重放、冲突 UI。
+1. 用户验收 1.4 与 1.5（`docs/PHASE-1-M45-REPORT.md`）。
+2. 进入阶段 2（知识与评测），或先补冲突合并 UI。
 3. 配置真实 AI 提供方前先确认密钥与预算策略。
 
 > 每次修改都需附实际证据；禁止未经运行验证标记 DONE。
