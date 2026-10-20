@@ -12,8 +12,11 @@ import type { ApiConfig } from "./config";
 import { openDatabase } from "./db";
 import { sendError } from "./http/errors";
 import { authRoutes } from "./routes/auth";
+import { calendarRoutes } from "./routes/calendar";
+import { learningRoutes } from "./routes/courses";
 import { healthRoutes } from "./routes/health";
 import { spaceRoutes } from "./routes/spaces";
+import { taskRoutes } from "./routes/tasks";
 
 export async function buildApp(
   config: ApiConfig,
@@ -36,6 +39,7 @@ export async function buildApp(
   await app.register(cors, {
     origin: config.corsOrigins.length > 0 ? config.corsOrigins : false,
     credentials: true,
+    methods: ["GET", "HEAD", "POST", "PATCH", "DELETE", "OPTIONS"],
   });
   await app.register(cookie, {
     secret: config.sessionSecret,
@@ -65,6 +69,9 @@ export async function buildApp(
   await app.register(healthRoutes, { version: config.version });
   await app.register(authRoutes, { secureCookies: config.secureCookies });
   await app.register(spaceRoutes);
+  await app.register(learningRoutes);
+  await app.register(taskRoutes);
+  await app.register(calendarRoutes);
 
   return app;
 }

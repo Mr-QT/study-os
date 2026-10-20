@@ -64,4 +64,41 @@ test.describe("Study OS workspace", () => {
 
     await page.screenshot({ path: "test-results/workspace-with-space.png", fullPage: true });
   });
+
+  test("creates a course, a task and a calendar event inside a space", async ({ page }) => {
+    await page.goto("/zh-CN");
+    const unavailable = page.getByText("数据库未配置");
+    if (await unavailable.isVisible().catch(() => false)) {
+      test.skip(true, "PostgreSQL is not configured in this environment");
+    }
+
+    const suffix = Date.now();
+    const spaceName = `空间-${suffix}`;
+    const courseName = `课程-${suffix}`;
+    const taskTitle = `任务-${suffix}`;
+    const eventTitle = `事件-${suffix}`;
+
+    await page.getByLabel("空间名称，例如：高等数学").fill(spaceName);
+    await page.getByRole("button", { name: "创建空间" }).click();
+    await page.getByRole("link", { name: new RegExp(spaceName) }).click();
+    await expect(page).toHaveURL(/\/spaces\/[0-9a-f-]+$/);
+
+    await page.getByLabel("课程名称，例如：高等数学").fill(courseName);
+    await page.getByRole("button", { name: "添加课程" }).click();
+    await expect(page.getByText(courseName).first()).toBeVisible();
+
+    await page.getByLabel("任务标题，例如：完成第一章习题").fill(taskTitle);
+    await page.getByRole("button", { name: "添加任务" }).click();
+    await expect(page.getByText(taskTitle)).toBeVisible();
+    await page.getByRole("button", { name: "完成" }).click();
+    await expect(page.getByRole("button", { name: "恢复" })).toBeVisible();
+
+    await page.getByLabel("事件标题，例如：期中考试").fill(eventTitle);
+    await page.getByLabel("开始时间").fill("2026-11-10T09:00");
+    await page.getByLabel("结束时间").fill("2026-11-10T11:00");
+    await page.getByRole("button", { name: "添加事件" }).click();
+    await expect(page.getByText(eventTitle)).toBeVisible();
+
+    await page.screenshot({ path: "test-results/space-detail.png", fullPage: true });
+  });
 });

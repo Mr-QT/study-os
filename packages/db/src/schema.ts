@@ -1,4 +1,15 @@
-import { index, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  date,
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 /** Guest users exist without an account; accounts are added in a later milestone. */
 export const userKindEnum = pgEnum("user_kind", ["guest", "account"]);
@@ -12,6 +23,10 @@ export const spacePrivacyEnum = pgEnum("space_privacy", [
 ]);
 
 export const membershipRoleEnum = pgEnum("membership_role", ["owner", "editor", "viewer"]);
+
+export const taskStatusEnum = pgEnum("task_status", ["todo", "in_progress", "done", "archived"]);
+export const taskPriorityEnum = pgEnum("task_priority", ["low", "medium", "high"]);
+export const calendarSourceEnum = pgEnum("calendar_source", ["manual", "task", "course"]);
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -62,8 +77,98 @@ export const memberships = pgTable(
   ],
 );
 
+export const terms = pgTable(
+  "terms",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    startsOn: date("starts_on", { mode: "string" }).notNull(),
+    endsOn: date("ends_on", { mode: "string" }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("terms_space_idx").on(table.spaceId)],
+);
+
+export const courses = pgTable(
+  "courses",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    termId: uuid("term_id").references(() => terms.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    code: text("code"),
+    instructor: text("instructor"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("courses_space_idx").on(table.spaceId),
+    index("courses_term_idx").on(table.termId),
+  ],
+);
+
+export const tasks = pgTable(
+  "tasks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id").references(() => courses.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    notes: text("notes"),
+    status: taskStatusEnum("status").notNull().default("todo"),
+    priority: taskPriorityEnum("priority").notNull().default("medium"),
+    dueAt: timestamp("due_at", { withTimezone: true }),
+    estimateMinutes: integer("estimate_minutes"),
+    version: integer("version").notNull().default(1),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("tasks_space_idx").on(table.spaceId),
+    index("tasks_course_idx").on(table.courseId),
+    index("tasks_due_idx").on(table.dueAt),
+  ],
+);
+
+export const calendarEvents = pgTable(
+  "calendar_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    timezone: text("timezone").notNull().default("Asia/Shanghai"),
+    sourceType: calendarSourceEnum("source_type").notNull().default("manual"),
+    sourceId: uuid("source_id"),
+    locked: boolean("locked").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("events_space_idx").on(table.spaceId),
+    index("events_starts_idx").on(table.startsAt),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
 export type NewSpaceRow = typeof spaces.$inferInsert;
 export type MembershipRow = typeof memberships.$inferSelect;
+export type TermRow = typeof terms.$inferSelect;
+export type CourseRow = typeof courses.$inferSelect;
+export type TaskRow = typeof tasks.$inferSelect;
+export type CalendarEventRow = typeof calendarEvents.$inferSelect;

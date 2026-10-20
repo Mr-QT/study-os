@@ -1,7 +1,7 @@
 # Study OS — 个人 AI 学习工作台
 
 > 产品定位：个人优先、轻量协作、AI 驱动、本地优先且可云端同步的长期学习操作系统。
-> 当前状态：**阶段 1 里程碑 1.1** 已完成——访客身份、学习空间、Drizzle 迁移与 IndexedDB 缓存；课程、任务、笔记等仍未实现（`PLANNED`）。
+> 当前状态：**阶段 1 里程碑 1.2** 已完成——访客身份、学习空间、学期/课程、任务与基础日历；笔记、专注、AI、同步仍未实现（`PLANNED`）。
 
 ## 快速开始（Windows）
 
@@ -36,8 +36,8 @@ pnpm dev
 ### 仓库结构
 
 ```text
-apps/web              Next.js 16 PWA（学习空间工作台、中英双语、Dexie 缓存）
-apps/api              Fastify 5 模块化单体（/health、/api/v1/auth、/api/v1/spaces）
+apps/web              Next.js 16 PWA（空间工作台、空间详情、双语、Dexie 缓存）
+apps/api              Fastify 5 模块化单体（auth/spaces/courses/tasks/calendar）
 packages/contracts    Zod 共享契约与 DTO
 packages/db           Drizzle schema 与 SQL 迁移
 docs/adr              架构决策记录（Proposed，待批准）

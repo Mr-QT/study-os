@@ -1,6 +1,7 @@
 "use client";
 
 import type { AuthSessionResponse, SpaceDto, SpaceResponse } from "@study-os/contracts";
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { AUTH_GUEST_ENDPOINT, SPACES_ENDPOINT } from "@/lib/api";
@@ -58,7 +59,7 @@ function privacyLabel(labels: WorkspaceLabels, privacy: SpaceDto["privacyLevel"]
   }
 }
 
-export function WorkspaceHome({ labels }: { labels: WorkspaceLabels }) {
+export function WorkspaceHome({ labels, locale }: { labels: WorkspaceLabels; locale: string }) {
   const [state, setState] = useState<ViewState>("loading");
   const [session, setSession] = useState<AuthSessionResponse | null>(null);
   const [cachedSpaces, setCachedSpaces] = useState<SpaceDto[]>([]);
@@ -151,15 +152,17 @@ export function WorkspaceHome({ labels }: { labels: WorkspaceLabels }) {
           key={space.id}
           className="rounded-xl border border-line bg-canvas p-4 transition-colors hover:border-accent/50"
         >
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="font-medium text-ink">{space.name}</h3>
-            <span className="shrink-0 rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent-ink">
-              {privacyLabel(labels, space.privacyLevel)}
-            </span>
-          </div>
-          <p className="mt-2 text-xs text-muted">
-            {new Date(space.updatedAt).toLocaleDateString()}
-          </p>
+          <Link href={`/${locale}/spaces/${space.id}`} className="block">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="font-medium text-ink">{space.name}</h3>
+              <span className="shrink-0 rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent-ink">
+                {privacyLabel(labels, space.privacyLevel)}
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-muted">
+              {new Date(space.updatedAt).toLocaleDateString()}
+            </p>
+          </Link>
         </li>
       ))}
     </ul>

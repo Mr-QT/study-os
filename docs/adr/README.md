@@ -13,6 +13,7 @@
 | [0007](0007-drizzle-orm.md) | 数据访问层（Drizzle ORM + SQL 迁移） | Proposed（已实现） | 是 |
 | [0008](0008-guest-session.md) | 本地访客身份与签名 Cookie 会话 | Proposed（已实现） | 是 |
 | [0009](0009-indexeddb-cache.md) | IndexedDB 空间缓存（Dexie） | Proposed（已实现） | 是 |
+| [0010](0010-optimistic-concurrency.md) | 任务更新的乐观并发（version + 409） | Proposed（已实现） | 是 |
 
 ## 状态说明
 
