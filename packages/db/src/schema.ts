@@ -462,6 +462,35 @@ export const knowledgeChunks = pgTable(
   ],
 );
 
+export const memoryScopeEnum = pgEnum("memory_scope", ["user", "space", "course"]);
+export const memoryKindEnum = pgEnum("memory_kind", ["fact", "preference", "inference"]);
+
+export const aiMemories = pgTable(
+  "ai_memories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    spaceId: uuid("space_id").references(() => spaces.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id").references(() => courses.id, { onDelete: "set null" }),
+    scope: memoryScopeEnum("scope").notNull().default("user"),
+    kind: memoryKindEnum("kind").notNull().default("fact"),
+    content: text("content").notNull(),
+    source: text("source").notNull().default("user"),
+    confidence: integer("confidence").notNull().default(80),
+    pinned: boolean("pinned").notNull().default(false),
+    disabled: boolean("disabled").notNull().default(false),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("memories_user_idx").on(table.userId),
+    index("memories_space_idx").on(table.spaceId),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -484,3 +513,4 @@ export type ExamQuestionRow = typeof examQuestions.$inferSelect;
 export type ExamAttemptRow = typeof examAttempts.$inferSelect;
 export type PdfAnnotationRow = typeof pdfAnnotations.$inferSelect;
 export type KnowledgeChunkRow = typeof knowledgeChunks.$inferSelect;
+export type AiMemoryRow = typeof aiMemories.$inferSelect;

@@ -15,6 +15,7 @@ import type { ApiConfig } from "./config";
 import { openDatabase } from "./db";
 import { sendError } from "./http/errors";
 import { aiRoutes } from "./routes/ai";
+import { analyticsRoutes } from "./routes/analytics";
 import { assessmentRoutes } from "./routes/assessment";
 import { authRoutes } from "./routes/auth";
 import { calendarRoutes } from "./routes/calendar";
@@ -24,6 +25,7 @@ import { focusRoutes } from "./routes/focus";
 import { healthRoutes } from "./routes/health";
 import { knowledgeRoutes } from "./routes/knowledge";
 import { learningLogRoutes } from "./routes/learning-log";
+import { memoryRoutes } from "./routes/memories";
 import { noteRoutes } from "./routes/notes";
 import { questionRoutes } from "./routes/questions";
 import { ragRoutes } from "./routes/rag";
@@ -31,6 +33,7 @@ import { spaceRoutes } from "./routes/spaces";
 import { statsRoutes } from "./routes/stats";
 import { syncRoutes } from "./routes/sync";
 import { taskRoutes } from "./routes/tasks";
+import { tutorRoutes } from "./routes/tutor";
 
 export interface AppDependencies {
   aiProvider?: AiProvider | null;
@@ -90,11 +93,14 @@ export async function buildApp(
   });
 
   await app.register(healthRoutes, { version: config.version });
-  await app.register(aiRoutes, {
-    provider: deps.aiProvider === undefined ? createAiProvider(config) : deps.aiProvider,
+  const aiProvider = deps.aiProvider === undefined ? createAiProvider(config) : deps.aiProvider;
+  const aiOptions = {
+    provider: aiProvider,
     budgetUsd: config.aiBudgetUsd ?? 5,
     costPer1kUsd: config.aiCostPer1kUsd ?? 0.002,
-  });
+  };
+  await app.register(aiRoutes, aiOptions);
+  await app.register(tutorRoutes, aiOptions);
   await app.register(authRoutes, { secureCookies: config.secureCookies });
   await app.register(spaceRoutes);
   await app.register(learningRoutes);
@@ -109,6 +115,8 @@ export async function buildApp(
   await app.register(questionRoutes);
   await app.register(assessmentRoutes);
   await app.register(knowledgeRoutes);
+  await app.register(memoryRoutes);
+  await app.register(analyticsRoutes);
   await app.register(ragRoutes, {
     embedder: deps.embedder ?? createLocalEmbedder(),
   });

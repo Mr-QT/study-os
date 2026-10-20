@@ -20,6 +20,9 @@ export const EXAM_ATTEMPTS_ENDPOINT = `${API_BASE_URL}/api/v1/exam-attempts`;
 export const SEMANTIC_SEARCH_ENDPOINT = `${API_BASE_URL}/api/v1/search/semantic`;
 export const RAG_REINDEX_ENDPOINT = `${API_BASE_URL}/api/v1/rag/reindex`;
 export const PDF_ANNOTATIONS_ENDPOINT = `${API_BASE_URL}/api/v1/pdf-annotations`;
+export const ANALYTICS_ENDPOINT = `${API_BASE_URL}/api/v1/analytics/overview`;
+export const MEMORIES_ENDPOINT = `${API_BASE_URL}/api/v1/memories`;
+export const TUTOR_ENDPOINT = `${API_BASE_URL}/api/v1/ai/tutor`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -115,4 +118,16 @@ export function pdfAnnotationsEndpoint(spaceId: string, fileId: string): string 
 
 export function pdfAnnotationEndpoint(): string {
   return PDF_ANNOTATIONS_ENDPOINT;
+}
+
+export function analyticsEndpoint(spaceId: string): string {
+  return `${ANALYTICS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function memoriesEndpoint(spaceId: string): string {
+  return `${MEMORIES_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function memoryEndpoint(memoryId: string): string {
+  return `${MEMORIES_ENDPOINT}/${memoryId}`;
 }

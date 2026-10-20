@@ -706,3 +706,93 @@ export const ragReindexResponseSchema = z.object({
   questions: z.number().int().nonnegative(),
   chunks: z.number().int().nonnegative(),
 });
+
+/* ------------------------------------------------------------------ */
+/* Stage 3: AI memory, analytics/risk and tutor                        */
+/* ------------------------------------------------------------------ */
+
+export const memoryScopeSchema = z.enum(["user", "space", "course"]);
+export const memoryKindSchema = z.enum(["fact", "preference", "inference"]);
+
+export const memorySchema = z.object({
+  id: z.string().min(1),
+  scope: memoryScopeSchema,
+  kind: memoryKindSchema,
+  content: z.string().min(1),
+  source: z.string().min(1),
+  confidence: z.number().int().min(0).max(100),
+  pinned: z.boolean(),
+  disabled: z.boolean(),
+  expiresAt: z.string().nullable(),
+  createdAt: z.string().min(1),
+  updatedAt: z.string().min(1),
+});
+export type MemoryDto = z.infer<typeof memorySchema>;
+
+export const createMemoryInputSchema = z.object({
+  spaceId: z.string().uuid().nullish(),
+  courseId: z.string().uuid().nullish(),
+  scope: memoryScopeSchema.optional(),
+  kind: memoryKindSchema.optional(),
+  content: z.string().trim().min(1).max(1000),
+  confidence: z.number().int().min(0).max(100).optional(),
+  expiresAt: z.string().optional(),
+  pinned: z.boolean().optional(),
+});
+export type CreateMemoryInput = z.infer<typeof createMemoryInputSchema>;
+
+export const updateMemoryInputSchema = z
+  .object({
+    content: z.string().trim().min(1).max(1000).optional(),
+    kind: memoryKindSchema.optional(),
+    confidence: z.number().int().min(0).max(100).optional(),
+    pinned: z.boolean().optional(),
+    disabled: z.boolean().optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, { message: "至少需要一个字段" });
+export type UpdateMemoryInput = z.infer<typeof updateMemoryInputSchema>;
+
+export const memoryListResponseSchema = z.object({ memories: z.array(memorySchema) });
+export const memoryResponseSchema = z.object({ memory: memorySchema });
+
+export const analyticsOverviewSchema = z.object({
+  tasks: z.object({
+    total: z.number().int().nonnegative(),
+    done: z.number().int().nonnegative(),
+    overdue: z.number().int().nonnegative(),
+  }),
+  focus: z.object({
+    minutes7d: z.number().int().nonnegative(),
+    minutesPrev7d: z.number().int().nonnegative(),
+  }),
+  exams: z.object({
+    attempts: z.number().int().nonnegative(),
+    averagePercentage: z.number().nonnegative(),
+  }),
+  weakQuestions: z.array(
+    z.object({
+      questionId: z.string().min(1),
+      prompt: z.string().min(1),
+      accuracy: z.number().nonnegative(),
+    }),
+  ),
+  risks: z.array(z.string()),
+});
+export type AnalyticsOverview = z.infer<typeof analyticsOverviewSchema>;
+
+export const tutorInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  question: z.string().trim().min(1).max(3000),
+  mode: z.enum(["socratic", "explain"]).optional(),
+});
+export type TutorInput = z.infer<typeof tutorInputSchema>;
+
+export const tutorResponseSchema = z.object({
+  invocationId: z.string().min(1),
+  text: z.string(),
+  provider: z.string().min(1),
+  model: z.string().min(1),
+  memoriesUsed: z.number().int().nonnegative(),
+  weakQuestionsUsed: z.number().int().nonnegative(),
+});
+export type TutorResponse = z.infer<typeof tutorResponseSchema>;

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { InsightsPanel } from "@/components/insights-panel";
 import { SpaceWorkspace } from "@/components/space-workspace";
 import { getDictionary, isLocale } from "@/lib/i18n";
 
@@ -139,6 +140,9 @@ export default async function SpacePage({
             fileHint: dict.fileHint,
           }}
         />
+        <div className="mt-6">
+          <InsightsPanel spaceId={id} locale={lang} />
+        </div>
       </main>
     </div>
   );

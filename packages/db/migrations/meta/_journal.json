@@ -57,6 +57,13 @@
       "when": 1792504545924,
       "tag": "0007_striped_madrox",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792505061872,
+      "tag": "0008_dear_winter_soldier",
+      "breakpoints": true
     }
   ]
 }
