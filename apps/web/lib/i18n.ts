@@ -114,6 +114,7 @@ export const dictionary = {
     aiRemaining: "剩余",
     aiError: "生成失败，请稍后重试。",
     aiPrivacyNote: "建议仅供参考，写入系统前需要你确认。",
+    offlinePending: "离线更改待同步",
   },
   en: {
     appName: "Study OS",
@@ -226,6 +227,7 @@ export const dictionary = {
     aiRemaining: "remaining",
     aiError: "Generation failed. Please try again later.",
     aiPrivacyNote: "Advice is a suggestion; nothing is written until you confirm.",
+    offlinePending: "Pending offline changes",
   },
 } as const satisfies Record<Locale, unknown>;
 

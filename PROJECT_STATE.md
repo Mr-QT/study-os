@@ -2,10 +2,10 @@
 
 - 日期：2026-10-20
 - 当前阶段：1 — 完整基础平台与核心学习闭环
-- 当前里程碑：1.4 完成（AI 网关，默认关闭）；1.5 部分完成（同步 pull/push 与统计；客户端 outbox 未做）
+- 当前里程碑：1.4 完成（AI 网关，默认关闭）；1.5 完成（Dexie outbox、离线重放、同步 pull/push、统计；冲突合并 UI 未做）
 - 已通过用户验收：阶段 0 未正式记录；用户已指示继续阶段 1
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 49 通过（contracts 10、api 39）；Playwright 10 通过
+- 测试结果：单元/集成 49 通过（contracts 10、api 39）；Playwright 11 通过
 - 部署状态：未部署
 - 数据库：PostgreSQL 16.14（便携实例，端口 55432），12 张表，迁移 0000–0004 已应用
 - 已确认技术基线：见 `docs/adr/`（全部为 Proposed，待批准）
@@ -33,7 +33,7 @@
 | `pnpm typecheck` | contracts / db / api / web 通过 |
 | `pnpm db:migrate` | 0000–0004 迁移成功 |
 | `pnpm test`（带 `DATABASE_URL`） | 49 passed（contracts 10、api 39） |
-| `pnpm test:e2e`（带数据库） | 10 passed |
+| `pnpm test:e2e`（带数据库） | 11 passed（含离线 outbox 重放） |
 | `pnpm build` | API 打包与 Web 构建成功 |
 
 ## 已实现
@@ -45,14 +45,15 @@
   - 月度预算硬上限（402 BUDGET_EXCEEDED）；成功/失败调用写入 `ai_invocations`；
   - `/api/v1/ai/status`、`/api/v1/ai/usage`、`/api/v1/ai/requests`；
   - Web AI 面板：未配置时明确提示；配置后可生成学习建议并显示预算。
-- 1.5（部分）：
+- 1.5（完成）：
   - `sync_changes` 变更日志；任务/笔记的创建、更新、删除都会记录；
   - `GET /api/v1/sync/pull` 游标增量拉取；`POST /api/v1/sync/push` 批量应用任务/笔记补丁并返回 accepted/conflict/rejected；
-  - `/api/v1/stats` 空间统计；Web 统计面板。
+  - Dexie `outbox` 表：离线时的任务状态变更先入队并乐观更新，联网后合并推送、清理队列；同一实体多次变更会合并；
+  - 冲突时刷新列表并提示；`/api/v1/stats` 与 Web 统计面板。
 
 ## 未完成项
 
-- **客户端 outbox、离线编辑队列、自动重放、冲突合并 UI 未实现**（1.5 的核心剩余部分）。
+- **冲突合并界面未实现**：冲突只做“已刷新”提示，没有逐字段合并或保留双方版本。
 - AI 未配置真实密钥，未对真实提供方做受控 smoke test；仅用 stub 验证逻辑。
 - 自动化、插件、复习/考试、AI 记忆等后续阶段未开始。
 - 账号体系、设备撤销、CSRF token 未实现。

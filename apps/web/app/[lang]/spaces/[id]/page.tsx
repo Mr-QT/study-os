@@ -50,6 +50,7 @@ export default async function SpacePage({
             taskUndo: dict.taskUndo,
             taskNoCourse: dict.taskNoCourse,
             taskConflict: dict.taskConflict,
+            offlinePending: dict.offlinePending,
             eventTitle: dict.eventTitle,
             eventEmpty: dict.eventEmpty,
             eventNamePlaceholder: dict.eventNamePlaceholder,

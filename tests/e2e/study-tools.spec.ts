@@ -43,4 +43,34 @@ test.describe("Study OS notes, focus and files", () => {
 
     await page.screenshot({ path: "test-results/space-tools.png", fullPage: true });
   });
+
+  test("queues an offline task toggle and replays it after reconnect", async ({ page, context }) => {
+    await page.goto("/zh-CN");
+    const unavailable = page.getByText("数据库未配置");
+    if (await unavailable.isVisible().catch(() => false)) {
+      test.skip(true, "PostgreSQL is not configured in this environment");
+    }
+
+    const suffix = Date.now();
+    const spaceName = `离线空间-${suffix}`;
+    await page.getByLabel("空间名称，例如：高等数学").fill(spaceName);
+    await page.getByRole("button", { name: "创建空间" }).click();
+    await page.getByRole("link", { name: new RegExp(spaceName) }).click();
+    await expect(page).toHaveURL(/\/spaces\/[0-9a-f-]+$/);
+
+    await page.getByLabel("任务标题，例如：完成第一章习题").fill(`离线任务-${suffix}`);
+    await page.getByRole("button", { name: "添加任务" }).click();
+    await expect(page.getByText(`离线任务-${suffix}`)).toBeVisible();
+
+    await context.setOffline(true);
+    await page.getByRole("button", { name: "完成" }).click();
+    await expect(page.getByText("离线更改待同步")).toBeVisible();
+
+    await context.setOffline(false);
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await expect(page.getByText("离线更改待同步")).toBeHidden({ timeout: 15_000 });
+
+    await page.reload();
+    await expect(page.getByRole("button", { name: "恢复" })).toBeVisible();
+  });
 });

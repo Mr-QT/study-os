@@ -20,6 +20,7 @@ import {
   taskEndpoint,
   taskListEndpoint,
 } from "@/lib/api";
+import { enqueueOperation, flushOutbox, pendingCount } from "@/lib/local-db";
 
 type LoadState = "loading" | "ready" | "notfound" | "error";
 
@@ -41,6 +42,7 @@ export interface SpaceLabels {
   taskUndo: string;
   taskNoCourse: string;
   taskConflict: string;
+  offlinePending: string;
   eventTitle: string;
   eventEmpty: string;
   eventNamePlaceholder: string;
@@ -116,6 +118,7 @@ export function SpaceWorkspace({
   const [taskBusy, setTaskBusy] = useState(false);
   const [taskError, setTaskError] = useState(false);
   const [taskConflict, setTaskConflict] = useState(false);
+  const [pendingChanges, setPendingChanges] = useState(0);
 
   const [eventTitle, setEventTitle] = useState("");
   const [eventStart, setEventStart] = useState("");
@@ -158,8 +161,24 @@ export function SpaceWorkspace({
   }, [spaceId]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    void (async () => {
+      await flushOutbox(spaceId);
+      await load();
+      setPendingChanges(await pendingCount(spaceId));
+    })();
+
+    const handleOnline = () => {
+      void (async () => {
+        const result = await flushOutbox(spaceId);
+        if (result.conflicts > 0) setTaskConflict(true);
+        await load();
+        setPendingChanges(await pendingCount(spaceId));
+      })();
+    };
+
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [load, spaceId]);
 
   const createCourse = useCallback(
     async (formEvent: React.FormEvent<HTMLFormElement>) => {
@@ -225,34 +244,57 @@ export function SpaceWorkspace({
     [spaceId, taskBusy, taskCourse, taskTitle],
   );
 
-  const toggleTask = useCallback(async (task: TaskDto) => {
-    const status = task.status === "done" ? "todo" : "done";
-    const response = await fetch(taskEndpoint(task.id), {
-      method: "PATCH",
-      credentials: "include",
-      headers: jsonHeaders,
-      body: JSON.stringify({ status, version: task.version }),
-    });
+  const toggleTask = useCallback(
+    async (task: TaskDto) => {
+      const status = task.status === "done" ? "todo" : "done";
+      setTasks((previous) =>
+        previous.map((item) => (item.id === task.id ? { ...item, status } : item)),
+      );
 
-    if (response.status === 409) {
-      setTaskConflict(true);
-      const refreshed = await fetch(taskListEndpoint(spaceId), {
-        credentials: "include",
-        headers: { accept: "application/json" },
-      });
-      if (refreshed.ok) {
-        const body = (await refreshed.json()) as { tasks: TaskDto[] };
-        setTasks(body.tasks);
+      try {
+        const response = await fetch(taskEndpoint(task.id), {
+          method: "PATCH",
+          credentials: "include",
+          headers: jsonHeaders,
+          body: JSON.stringify({ status, version: task.version }),
+        });
+
+        if (response.status === 409) {
+          setTaskConflict(true);
+          const refreshed = await fetch(taskListEndpoint(spaceId), {
+            credentials: "include",
+            headers: { accept: "application/json" },
+          });
+          if (refreshed.ok) {
+            const body = (await refreshed.json()) as { tasks: TaskDto[] };
+            setTasks(body.tasks);
+          }
+          return;
+        }
+
+        if (!response.ok) {
+          setTaskError(true);
+          return;
+        }
+
+        const { task: updated } = (await response.json()) as { task: TaskDto };
+        setTasks((previous) => previous.map((item) => (item.id === updated.id ? updated : item)));
+        setTaskConflict(false);
+      } catch {
+        // Offline: keep the optimistic state and replay through the sync outbox.
+        await enqueueOperation({
+          spaceId,
+          entityType: "task",
+          entityId: task.id,
+          action: "patch",
+          patch: { status },
+          baseVersion: task.version,
+        });
+        setPendingChanges(await pendingCount(spaceId));
       }
-      return;
-    }
-
-    if (response.ok) {
-      const { task: updated } = (await response.json()) as { task: TaskDto };
-      setTasks((previous) => previous.map((item) => (item.id === updated.id ? updated : item)));
-      setTaskConflict(false);
-    }
-  }, [spaceId]);
+    },
+    [spaceId],
+  );
 
   const createEvent = useCallback(
     async (formEvent: React.FormEvent<HTMLFormElement>) => {
@@ -386,6 +428,11 @@ export function SpaceWorkspace({
         {taskConflict ? (
           <p role="status" className="mt-2 text-xs text-warn">
             {labels.taskConflict}
+          </p>
+        ) : null}
+        {pendingChanges > 0 ? (
+          <p role="status" className="mt-2 text-xs text-warn">
+            {labels.offlinePending} ({pendingChanges})
           </p>
         ) : null}
         {tasks.length === 0 ? (

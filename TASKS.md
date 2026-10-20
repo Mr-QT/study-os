@@ -12,7 +12,7 @@
 | P1-02 | 课程、任务、日历 | DONE | 36 测试 + 9 E2E |
 | P1-03 | 笔记、专注、学习日志、文件 | DONE | 42 测试 + 10 E2E |
 | P1-04 | AI 网关与学习建议 | DONE | 49 测试（AI 用 stub）；默认关闭；真实提供方未验证 |
-| P1-05 | 增量同步、冲突与统计 | PARTIAL | pull/push、stats、冲突 409 已验证；客户端 outbox 与离线重放未实现 |
-| P1-06 | 离线重放与冲突 UI | TODO | 下一步 |
+| P1-05 | 增量同步、离线 outbox 与统计 | DONE | pull/push、Dexie outbox + 离线重放、stats；11 E2E 通过 |
+| P1-06 | 冲突合并 UI | TODO | 当前仅刷新提示 |
 
 状态限定：TODO / IN_PROGRESS / BLOCKED / PARTIAL / DONE（DONE 需证据）。

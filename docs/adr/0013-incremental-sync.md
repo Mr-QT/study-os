@@ -13,9 +13,15 @@
 - `POST /api/v1/sync/push`：批量操作，逐条返回 `accepted / conflict / rejected`；`baseVersion` 不匹配返回 `conflict` 与当前版本，不静默覆盖。
 - 权限：push 需要编辑权限，pull 需要读权限；非成员 404。
 
+## 已实现（客户端）
+
+- Dexie `outbox` 表：离线任务状态变更入队并乐观更新；
+- 联网后 `flushOutbox` 调 push，合并同一实体的多次变更，成功后清空队列；
+- 冲突时刷新列表并提示，不静默覆盖。
+
 ## 尚未实现
 
-- 客户端持久 outbox、离线编辑队列、自动重放与冲突 UI。
+- 逐字段冲突合并 UI、笔记的离线编辑入口。
 - 实体 payload 未包含在变更中（客户端按 `entityId` 再拉取）；后续可加压缩 payload。
 - 变更日志未做保留期清理。
 
