@@ -516,6 +516,86 @@ export const learningPlans = pgTable(
   ],
 );
 
+export const automationTriggerEnum = pgEnum("automation_trigger", [
+  "task.completed",
+  "focus.completed",
+  "exam.submitted",
+]);
+export const automationRunStatusEnum = pgEnum("automation_run_status", ["ok", "error", "skipped"]);
+export const notificationChannelEnum = pgEnum("notification_channel", ["in_app", "email", "pwa"]);
+export const notificationStatusEnum = pgEnum("notification_status", [
+  "pending",
+  "sent",
+  "failed",
+  "read",
+]);
+
+export const automationRules = pgTable(
+  "automation_rules",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    trigger: automationTriggerEnum("trigger").notNull(),
+    conditions: text("conditions").notNull().default("{}"),
+    actions: text("actions").notNull().default("[]"),
+    enabled: boolean("enabled").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("rules_space_idx").on(table.spaceId),
+    index("rules_trigger_idx").on(table.trigger),
+  ],
+);
+
+export const automationRuns = pgTable(
+  "automation_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ruleId: uuid("rule_id")
+      .notNull()
+      .references(() => automationRules.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    trigger: automationTriggerEnum("trigger").notNull(),
+    status: automationRunStatusEnum("status").notNull().default("ok"),
+    message: text("message"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("runs_rule_idx").on(table.ruleId)],
+);
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    spaceId: uuid("space_id").references(() => spaces.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    body: text("body"),
+    channel: notificationChannelEnum("channel").notNull().default("in_app"),
+    status: notificationStatusEnum("status").notNull().default("pending"),
+    scheduledAt: timestamp("scheduled_at", { withTimezone: true }).notNull().defaultNow(),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    dedupeKey: text("dedupe_key"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("notifications_user_idx").on(table.userId),
+    index("notifications_status_idx").on(table.status),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -540,3 +620,6 @@ export type PdfAnnotationRow = typeof pdfAnnotations.$inferSelect;
 export type KnowledgeChunkRow = typeof knowledgeChunks.$inferSelect;
 export type AiMemoryRow = typeof aiMemories.$inferSelect;
 export type LearningPlanRow = typeof learningPlans.$inferSelect;
+export type AutomationRuleRow = typeof automationRules.$inferSelect;
+export type AutomationRunRow = typeof automationRuns.$inferSelect;
+export type NotificationRow = typeof notifications.$inferSelect;

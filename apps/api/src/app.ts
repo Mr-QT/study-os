@@ -19,6 +19,7 @@ import { agentRoutes } from "./routes/agents";
 import { analyticsRoutes } from "./routes/analytics";
 import { assessmentRoutes } from "./routes/assessment";
 import { authRoutes } from "./routes/auth";
+import { automationRoutes } from "./routes/automation";
 import { calendarRoutes } from "./routes/calendar";
 import { learningRoutes } from "./routes/courses";
 import { fileRoutes } from "./routes/files";
@@ -120,6 +121,7 @@ export async function buildApp(
   await app.register(statsRoutes);
   await app.register(questionRoutes);
   await app.register(assessmentRoutes);
+  await app.register(automationRoutes);
   await app.register(knowledgeRoutes);
   await app.register(memoryRoutes);
   await app.register(analyticsRoutes);

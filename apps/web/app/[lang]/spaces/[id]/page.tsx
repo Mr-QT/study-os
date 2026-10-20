@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { AutomationPanel } from "@/components/automation-panel";
 import { InsightsPanel } from "@/components/insights-panel";
 import { PlansPanel } from "@/components/plans-panel";
 import { SpaceWorkspace } from "@/components/space-workspace";
@@ -143,6 +144,7 @@ export default async function SpacePage({
         />
         <div className="mt-6 flex flex-col gap-6">
           <PlansPanel spaceId={id} locale={lang} />
+          <AutomationPanel spaceId={id} locale={lang} />
           <InsightsPanel spaceId={id} locale={lang} />
         </div>
       </main>

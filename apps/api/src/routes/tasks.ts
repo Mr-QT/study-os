@@ -15,6 +15,7 @@ import { courses, tasks, type Db, type UserRow } from "@study-os/db";
 
 import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess } from "../auth/space-access";
+import { runAutomations } from "../automation/engine";
 import { toTaskDto } from "../dto";
 import { forbidden, notFound, sendError, validationError } from "../http/errors";
 import { recordChange } from "../sync/record";
@@ -205,6 +206,18 @@ export const taskRoutes: FastifyPluginAsync = async (app) => {
       operation: "update",
       version: updated.version,
     });
+    if (existing.status !== "done" && updated.status === "done") {
+      try {
+        await runAutomations(database.db, {
+          trigger: "task.completed",
+          spaceId: updated.spaceId,
+          userId: user.id,
+          context: { taskId: updated.id, status: "done" },
+        });
+      } catch {
+        // Automation must never fail the user's write.
+      }
+    }
     return taskResponseSchema.parse({ task: toTaskDto(updated) });
   });
 

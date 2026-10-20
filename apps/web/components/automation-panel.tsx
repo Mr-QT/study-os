@@ -1,0 +1,253 @@
+"use client";
+
+import type {
+  AutomationRuleDto,
+  AutomationRunDto,
+  NotificationDto,
+} from "@study-os/contracts";
+import { useCallback, useEffect, useState } from "react";
+
+import {
+  AUTOMATION_RULES_ENDPOINT,
+  NOTIFICATIONS_DISPATCH_ENDPOINT,
+  automationRuleEndpoint,
+  automationRulesEndpoint,
+  automationRunsEndpoint,
+  notificationReadEndpoint,
+  notificationsEndpoint,
+} from "@/lib/api";
+
+const TEXT = {
+  "zh-CN": {
+    title: "自动化与通知",
+    rules: "自动化规则",
+    noRules: "还没有规则。",
+    ruleName: "规则名称，例如：完成任务后提醒",
+    notificationTitle: "通知标题，例如：任务完成",
+    addRule: "添加规则",
+    enable: "启用",
+    disable: "停用",
+    runs: "最近运行",
+    noRuns: "暂无运行记录。",
+    notifications: "通知",
+    noNotifications: "暂无通知。",
+    dispatch: "发送待处理通知",
+    markRead: "标为已读",
+    unread: "未读",
+  },
+  en: {
+    title: "Automation and notifications",
+    rules: "Automation rules",
+    noRules: "No rules yet.",
+    ruleName: "Rule name, e.g. remind after task done",
+    notificationTitle: "Notification title, e.g. Task done",
+    addRule: "Add rule",
+    enable: "Enable",
+    disable: "Disable",
+    runs: "Recent runs",
+    noRuns: "No runs yet.",
+    notifications: "Notifications",
+    noNotifications: "No notifications yet.",
+    dispatch: "Dispatch pending",
+    markRead: "Mark read",
+    unread: "unread",
+  },
+} as const;
+
+export function AutomationPanel({ spaceId, locale }: { spaceId: string; locale: string }) {
+  const text = locale === "en" ? TEXT.en : TEXT["zh-CN"];
+  const [rules, setRules] = useState<AutomationRuleDto[]>([]);
+  const [runs, setRuns] = useState<AutomationRunDto[]>([]);
+  const [notifications, setNotifications] = useState<NotificationDto[]>([]);
+  const [unread, setUnread] = useState(0);
+  const [ruleName, setRuleName] = useState("");
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const load = useCallback(async () => {
+    const [rulesResponse, runsResponse, notificationsResponse] = await Promise.all([
+      fetch(automationRulesEndpoint(spaceId), { credentials: "include", headers: { accept: "application/json" } }),
+      fetch(automationRunsEndpoint(spaceId), { credentials: "include", headers: { accept: "application/json" } }),
+      fetch(notificationsEndpoint(spaceId), { credentials: "include", headers: { accept: "application/json" } }),
+    ]);
+    if (rulesResponse.ok) {
+      setRules(((await rulesResponse.json()) as { rules: AutomationRuleDto[] }).rules);
+    }
+    if (runsResponse.ok) {
+      setRuns(((await runsResponse.json()) as { runs: AutomationRunDto[] }).runs.slice(0, 5));
+    }
+    if (notificationsResponse.ok) {
+      const body = (await notificationsResponse.json()) as {
+        notifications: NotificationDto[];
+        unread: number;
+      };
+      setNotifications(body.notifications);
+      setUnread(body.unread);
+    }
+  }, [spaceId]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const addRule = useCallback(async () => {
+    if (!ruleName.trim() || !notificationTitle.trim() || busy) return;
+    setBusy(true);
+    try {
+      const response = await fetch(AUTOMATION_RULES_ENDPOINT, {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify({
+          spaceId,
+          name: ruleName.trim(),
+          trigger: "task.completed",
+          actions: [{ type: "create_notification", title: notificationTitle.trim() }],
+        }),
+      });
+      if (response.ok) {
+        setRuleName("");
+        setNotificationTitle("");
+        await load();
+      }
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, load, notificationTitle, ruleName, spaceId]);
+
+  const toggleRule = useCallback(
+    async (rule: AutomationRuleDto) => {
+      const response = await fetch(automationRuleEndpoint(rule.id), {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify({ enabled: !rule.enabled }),
+      });
+      if (response.ok) await load();
+    },
+    [load],
+  );
+
+  const dispatch = useCallback(async () => {
+    await fetch(NOTIFICATIONS_DISPATCH_ENDPOINT, { method: "POST", credentials: "include" });
+    await load();
+  }, [load]);
+
+  const markRead = useCallback(
+    async (notification: NotificationDto) => {
+      await fetch(notificationReadEndpoint(notification.id), {
+        method: "PATCH",
+        credentials: "include",
+      });
+      await load();
+    },
+    [load],
+  );
+
+  return (
+    <section className="rounded-2xl border border-line bg-surface p-6">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-lg font-semibold">{text.title}</h3>
+        <p className="text-xs text-muted">
+          {unread} {text.unread}
+        </p>
+      </div>
+
+      <h4 className="mt-4 text-sm font-semibold text-muted">{text.rules}</h4>
+      <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+        <input
+          value={ruleName}
+          onChange={(event) => setRuleName(event.target.value)}
+          placeholder={text.ruleName}
+          aria-label={text.ruleName}
+          className="flex-1 rounded-xl border border-line bg-canvas px-3 py-2 text-sm outline-none focus:border-accent"
+        />
+        <input
+          value={notificationTitle}
+          onChange={(event) => setNotificationTitle(event.target.value)}
+          placeholder={text.notificationTitle}
+          aria-label={text.notificationTitle}
+          className="flex-1 rounded-xl border border-line bg-canvas px-3 py-2 text-sm outline-none focus:border-accent"
+        />
+        <button
+          type="button"
+          onClick={() => void addRule()}
+          disabled={busy || !ruleName.trim() || !notificationTitle.trim()}
+          className="rounded-xl bg-accent-ink px-4 py-2 text-sm font-medium text-canvas disabled:opacity-50"
+        >
+          {text.addRule}
+        </button>
+      </div>
+      {rules.length === 0 ? (
+        <p className="mt-2 text-sm text-muted">{text.noRules}</p>
+      ) : (
+        <ul className="mt-2 flex flex-col gap-1">
+          {rules.map((rule) => (
+            <li key={rule.id} className="flex items-center justify-between gap-2 text-sm">
+              <span className={rule.enabled ? "" : "text-muted line-through"}>{rule.name}</span>
+              <button
+                type="button"
+                onClick={() => void toggleRule(rule)}
+                className="rounded-lg border border-line px-2 py-1 text-xs hover:border-accent"
+              >
+                {rule.enabled ? text.disable : text.enable}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <h4 className="mt-4 text-sm font-semibold text-muted">{text.runs}</h4>
+      {runs.length === 0 ? (
+        <p className="mt-1 text-xs text-muted">{text.noRuns}</p>
+      ) : (
+        <ul className="mt-1 text-xs text-muted">
+          {runs.map((run) => (
+            <li key={run.id}>
+              {run.trigger} · {run.status} · {new Date(run.createdAt).toLocaleString()}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        <h4 className="text-sm font-semibold text-muted">{text.notifications}</h4>
+        <button
+          type="button"
+          onClick={() => void dispatch()}
+          className="rounded-lg border border-line px-3 py-1.5 text-xs hover:border-accent"
+        >
+          {text.dispatch}
+        </button>
+      </div>
+      {notifications.length === 0 ? (
+        <p className="mt-2 text-sm text-muted">{text.noNotifications}</p>
+      ) : (
+        <ul className="mt-2 flex flex-col gap-2">
+          {notifications.map((notification) => (
+            <li
+              key={notification.id}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line bg-canvas px-3 py-2 text-sm"
+            >
+              <span className={notification.readAt ? "text-muted" : "font-medium"}>
+                {notification.title}
+              </span>
+              <span className="flex items-center gap-2 text-xs text-muted">
+                {notification.status}
+                {!notification.readAt ? (
+                  <button
+                    type="button"
+                    onClick={() => void markRead(notification)}
+                    className="hover:text-accent-ink"
+                  >
+                    {text.markRead}
+                  </button>
+                ) : null}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}

@@ -71,6 +71,13 @@
       "when": 1792511358736,
       "tag": "0009_foamy_bucky",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792511985169,
+      "tag": "0010_adorable_valeria_richards",
+      "breakpoints": true
     }
   ]
 }

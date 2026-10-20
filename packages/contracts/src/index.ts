@@ -870,3 +870,105 @@ export const extractMemoriesInputSchema = z.object({
 export const extractMemoriesResponseSchema = z.object({
   memories: z.array(memorySchema),
 });
+
+/* ------------------------------------------------------------------ */
+/* Stage 4: automation rules and notifications                         */
+/* ------------------------------------------------------------------ */
+
+export const automationTriggerSchema = z.enum([
+  "task.completed",
+  "focus.completed",
+  "exam.submitted",
+]);
+export type AutomationTrigger = z.infer<typeof automationTriggerSchema>;
+
+export const automationActionSchema = z.object({
+  type: z.enum(["create_notification", "create_task"]),
+  title: z.string().trim().min(1).max(200),
+  body: z.string().max(1000).optional(),
+  dueInDays: z.number().int().min(0).max(365).optional(),
+});
+export type AutomationAction = z.infer<typeof automationActionSchema>;
+
+export const automationRuleSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  trigger: automationTriggerSchema,
+  conditions: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])),
+  actions: z.array(automationActionSchema),
+  enabled: z.boolean(),
+  createdAt: z.string().min(1),
+  updatedAt: z.string().min(1),
+});
+export type AutomationRuleDto = z.infer<typeof automationRuleSchema>;
+
+export const createAutomationRuleInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  name: z.string().trim().min(1).max(120),
+  trigger: automationTriggerSchema,
+  conditions: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
+  actions: z.array(automationActionSchema).min(1).max(5),
+  enabled: z.boolean().optional(),
+});
+export type CreateAutomationRuleInput = z.infer<typeof createAutomationRuleInputSchema>;
+
+export const updateAutomationRuleInputSchema = z
+  .object({
+    name: z.string().trim().min(1).max(120).optional(),
+    conditions: z
+      .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
+      .optional(),
+    actions: z.array(automationActionSchema).min(1).max(5).optional(),
+    enabled: z.boolean().optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, { message: "至少需要一个字段" });
+
+export const automationRuleListResponseSchema = z.object({
+  rules: z.array(automationRuleSchema),
+});
+export const automationRuleResponseSchema = z.object({ rule: automationRuleSchema });
+
+export const automationRunSchema = z.object({
+  id: z.string().min(1),
+  ruleId: z.string().min(1),
+  trigger: automationTriggerSchema,
+  status: z.enum(["ok", "error", "skipped"]),
+  message: z.string().nullable(),
+  createdAt: z.string().min(1),
+});
+export const automationRunListResponseSchema = z.object({
+  runs: z.array(automationRunSchema),
+});
+export type AutomationRunDto = z.infer<typeof automationRunSchema>;
+
+export const dryRunInputSchema = z.object({
+  context: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
+});
+export const dryRunResponseSchema = z.object({
+  matched: z.boolean(),
+  actions: z.array(automationActionSchema),
+});
+
+export const notificationSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  body: z.string().nullable(),
+  channel: z.enum(["in_app", "email", "pwa"]),
+  status: z.enum(["pending", "sent", "failed", "read"]),
+  scheduledAt: z.string().min(1),
+  sentAt: z.string().nullable(),
+  readAt: z.string().nullable(),
+  createdAt: z.string().min(1),
+});
+export type NotificationDto = z.infer<typeof notificationSchema>;
+
+export const notificationListResponseSchema = z.object({
+  notifications: z.array(notificationSchema),
+  unread: z.number().int().nonnegative(),
+});
+
+export const dispatchResponseSchema = z.object({
+  sent: z.number().int().nonnegative(),
+  skipped: z.number().int().nonnegative(),
+  failed: z.number().int().nonnegative(),
+});

@@ -1,13 +1,13 @@
 # PROJECT_STATE — 真实项目状态
 
 - 日期：2026-10-20
-- 当前阶段：3 — 智能学习引擎（完成）
-- 当前里程碑：3.1 记忆/分析/导师；3.2 多 Agent、学习计划、记忆提取、风险评分 — 完成
+- 当前阶段：4 — 智能日程与自动化（进行中）
+- 当前里程碑：4.1 自动化规则引擎、运行记录与通知中心 — 完成
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 69 通过（contracts 10、api 59）；Playwright 12 通过
-- 数据库：PostgreSQL 16（Docker Compose，持久卷），22 张表，迁移 0000–0009
+- 测试结果：单元/集成 74 通过（contracts 10、api 64）；Playwright 12 通过
+- 数据库：PostgreSQL 16（Docker Compose，持久卷），25 张表，迁移 0000–0010
 - 部署状态：未部署
-- 最近 commit：`a1b1355`
+- 最近 commit：本次提交后更新
 
 ## 环境（实测）
 
@@ -26,32 +26,31 @@
 | 命令 | 结果 |
 |---|---|
 | `pnpm lint` / `typecheck` / `build` | 通过 |
-| `pnpm test` | 69 passed（contracts 10、api 59） |
+| `pnpm test` | 74 passed（contracts 10、api 64） |
 | `pnpm test:e2e` | 12 passed |
-| `pnpm verify:db` | 容器 healthy、迁移成功 |
 
 ## 已实现
 
-- 阶段 1、2：完整学习平台、题库/考试/复习、本地 RAG、PDF 查看与标注。
-- 3.1：AI 记忆 CRUD、学习分析/风险、导师答疑（记忆+薄弱题注入）。
-- 3.2：
-  - **多 Agent 角色**：planner / tutor / examiner / analyst；`/api/v1/agents` 与 `/api/v1/agents/:role/run`，统一隐私/预算/审计（purpose=`agent:<role>`）。
-  - **学习计划/自适应教学**：`learning_plans`，planner 生成 JSON 步骤（诊断/学习/练习/复盘），失败回退内置模板；步骤可推进，全部完成自动置 completed。
-  - **记忆自动提取**：`POST /api/v1/memories/extract`，从对话文本提取事实/偏好/推断（最多 5 条）。
-  - **风险评分**：分析接口新增 0–100 `riskScore`（逾期、专注不足、考试偏低、薄弱题、专注下滑加权）。
-  - Web：空间页新增「学习计划」面板（生成计划、勾选步骤）；洞察面板显示风险分。
+- 阶段 1–3：学习平台、题库/考试/复习、RAG/PDF、AI 记忆、分析/风险、导师、多 Agent、学习计划、记忆提取。
+- 4.1：
+  - **自动化规则**：trigger（task.completed / focus.completed / exam.submitted）+ conditions + actions（create_notification / create_task）；规则 CRUD、启停、dry-run；
+  - **运行记录**：`automation_runs`，成功/失败留痕；
+  - **通知中心**：`notifications`，站内通知列表、未读数、标为已读、`dispatch` 发送到期站内通知（email/pwa 暂未接投递）；
+  - **事件钩子**：任务首次变为 done 时触发 `task.completed` 自动化，失败不影响用户写入；
+  - Web：「自动化与通知」面板（规则增删启停、最近运行、通知列表/发送/已读）。
 
-## 未完成项（跨阶段）
+## 未完成项（阶段 4 剩余）
 
-- Agent 目前是“角色提示词 + 上下文”，没有工具调用/多步自主执行。
-- 计划生成在 AI 失败时回退固定模板；未做完整诊断式自适应状态机。
-- 冲突合并 UI、账号/CSRF、对象存储、CI 远端运行。
-- 阶段 4（自动化/通知）及以后未开始。
+- 邮件 / PWA 推送的真实投递（需 SMTP/推送服务与凭据）。
+- 定时调度 worker（当前 dispatch 需手动/外部触发）。
+- 自然语言生成规则（AI 草案）与审批流。
+- 高级日历/通知调度（重复事件、勿扰、摘要）。
+- 跨阶段：冲突合并 UI、账号/CSRF、对象存储、CI 远端运行。
 
 ## 下一步
 
-1. 用户验收阶段 3。
-2. 进入阶段 4（自动化引擎、通知与多渠道调度）。
-3. 或先补跨阶段项（账号、冲突 UI、对象存储、CI）。
+1. 验收 4.1。
+2. 继续 4.2：调度 worker + 多渠道投递（需用户提供 SMTP/推送凭据）。
+3. 或先补跨阶段项。
 
 > 每次修改都需附实际证据；禁止未经运行验证标记 DONE。

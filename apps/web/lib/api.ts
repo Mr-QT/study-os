@@ -24,6 +24,10 @@ export const ANALYTICS_ENDPOINT = `${API_BASE_URL}/api/v1/analytics/overview`;
 export const MEMORIES_ENDPOINT = `${API_BASE_URL}/api/v1/memories`;
 export const TUTOR_ENDPOINT = `${API_BASE_URL}/api/v1/ai/tutor`;
 export const PLANS_ENDPOINT = `${API_BASE_URL}/api/v1/learning-plans`;
+export const AUTOMATION_RULES_ENDPOINT = `${API_BASE_URL}/api/v1/automation/rules`;
+export const AUTOMATION_RUNS_ENDPOINT = `${API_BASE_URL}/api/v1/automation/runs`;
+export const NOTIFICATIONS_ENDPOINT = `${API_BASE_URL}/api/v1/notifications`;
+export const NOTIFICATIONS_DISPATCH_ENDPOINT = `${NOTIFICATIONS_ENDPOINT}/dispatch`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -139,4 +143,24 @@ export function plansListEndpoint(spaceId: string): string {
 
 export function planStepEndpoint(planId: string): string {
   return `${PLANS_ENDPOINT}/${planId}/steps`;
+}
+
+export function automationRulesEndpoint(spaceId: string): string {
+  return `${AUTOMATION_RULES_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function automationRunsEndpoint(spaceId: string): string {
+  return `${AUTOMATION_RUNS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function automationRuleEndpoint(ruleId: string): string {
+  return `${AUTOMATION_RULES_ENDPOINT}/${ruleId}`;
+}
+
+export function notificationReadEndpoint(notificationId: string): string {
+  return `${NOTIFICATIONS_ENDPOINT}/${notificationId}/read`;
+}
+
+export function notificationsEndpoint(spaceId: string): string {
+  return `${NOTIFICATIONS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
 }
