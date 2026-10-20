@@ -120,6 +120,18 @@ export interface SpaceLabels {
   semanticReindex: string;
   semanticEmpty: string;
   semanticReindexed: string;
+  pdfView: string;
+  pdfClose: string;
+  pdfPrev: string;
+  pdfNext: string;
+  pdfPage: string;
+  pdfLoading: string;
+  pdfLoadError: string;
+  pdfAnnotations: string;
+  pdfNoAnnotations: string;
+  pdfNotePlaceholder: string;
+  pdfSave: string;
+  pdfClickHint: string;
 }
 
 const jsonHeaders = { "content-type": "application/json", accept: "application/json" };
@@ -589,6 +601,18 @@ export function SpaceWorkspace({
           selectFile: labels.fileSelect,
           remove: labels.fileDelete,
           hint: labels.fileHint,
+          pdfView: labels.pdfView,
+          pdfClose: labels.pdfClose,
+          pdfPrev: labels.pdfPrev,
+          pdfNext: labels.pdfNext,
+          pdfPage: labels.pdfPage,
+          pdfLoading: labels.pdfLoading,
+          pdfLoadError: labels.pdfLoadError,
+          pdfAnnotations: labels.pdfAnnotations,
+          pdfNoAnnotations: labels.pdfNoAnnotations,
+          pdfNotePlaceholder: labels.pdfNotePlaceholder,
+          pdfSave: labels.pdfSave,
+          pdfClickHint: labels.pdfClickHint,
         }}
       />
       <SemanticSearchPanel

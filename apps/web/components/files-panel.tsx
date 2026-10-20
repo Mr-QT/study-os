@@ -3,6 +3,7 @@
 import type { FileAssetDto } from "@study-os/contracts";
 import { useCallback, useEffect, useState } from "react";
 
+import { PdfViewer } from "@/components/pdf-viewer";
 import { FILES_ENDPOINT, fileContentEndpoint, fileEndpoint, filesListEndpoint } from "@/lib/api";
 
 export interface FilesLabels {
@@ -13,6 +14,18 @@ export interface FilesLabels {
   selectFile: string;
   remove: string;
   hint: string;
+  pdfView: string;
+  pdfClose: string;
+  pdfPrev: string;
+  pdfNext: string;
+  pdfPage: string;
+  pdfLoading: string;
+  pdfLoadError: string;
+  pdfAnnotations: string;
+  pdfNoAnnotations: string;
+  pdfNotePlaceholder: string;
+  pdfSave: string;
+  pdfClickHint: string;
 }
 
 export function FilesPanel({ spaceId, labels }: { spaceId: string; labels: FilesLabels }) {
@@ -20,6 +33,7 @@ export function FilesPanel({ spaceId, labels }: { spaceId: string; labels: Files
   const [selected, setSelected] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [viewer, setViewer] = useState<FileAssetDto | null>(null);
 
   const load = useCallback(async () => {
     const response = await fetch(filesListEndpoint(spaceId), {
@@ -111,6 +125,15 @@ export function FilesPanel({ spaceId, labels }: { spaceId: string; labels: Files
               <span className="shrink-0 text-xs text-muted">
                 {(file.sizeBytes / 1024).toFixed(0)} KB
               </span>
+              {file.mime === "application/pdf" ? (
+                <button
+                  type="button"
+                  onClick={() => setViewer(file)}
+                  className="shrink-0 text-xs text-accent-ink hover:underline"
+                >
+                  {labels.pdfView}
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={() => void remove(file)}
@@ -122,6 +145,29 @@ export function FilesPanel({ spaceId, labels }: { spaceId: string; labels: Files
           ))}
         </ul>
       )}
+
+      {viewer ? (
+        <PdfViewer
+          spaceId={spaceId}
+          fileId={viewer.id}
+          fileName={viewer.name}
+          labels={{
+            title: labels.pdfView,
+            close: labels.pdfClose,
+            prev: labels.pdfPrev,
+            next: labels.pdfNext,
+            page: labels.pdfPage,
+            loading: labels.pdfLoading,
+            loadError: labels.pdfLoadError,
+            annotations: labels.pdfAnnotations,
+            noAnnotations: labels.pdfNoAnnotations,
+            notePlaceholder: labels.pdfNotePlaceholder,
+            save: labels.pdfSave,
+            clickHint: labels.pdfClickHint,
+          }}
+          onClose={() => setViewer(null)}
+        />
+      ) : null}
     </section>
   );
 }

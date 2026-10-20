@@ -19,6 +19,7 @@ export const EXAMS_ENDPOINT = `${API_BASE_URL}/api/v1/exams`;
 export const EXAM_ATTEMPTS_ENDPOINT = `${API_BASE_URL}/api/v1/exam-attempts`;
 export const SEMANTIC_SEARCH_ENDPOINT = `${API_BASE_URL}/api/v1/search/semantic`;
 export const RAG_REINDEX_ENDPOINT = `${API_BASE_URL}/api/v1/rag/reindex`;
+export const PDF_ANNOTATIONS_ENDPOINT = `${API_BASE_URL}/api/v1/pdf-annotations`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -106,4 +107,12 @@ export function examAttemptEndpoint(attemptId: string): string {
 
 export function semanticSearchEndpoint(spaceId: string, query: string): string {
   return `${SEMANTIC_SEARCH_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}&q=${encodeURIComponent(query)}`;
+}
+
+export function pdfAnnotationsEndpoint(spaceId: string, fileId: string): string {
+  return `${PDF_ANNOTATIONS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}&fileId=${encodeURIComponent(fileId)}`;
+}
+
+export function pdfAnnotationEndpoint(): string {
+  return PDF_ANNOTATIONS_ENDPOINT;
 }

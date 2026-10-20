@@ -1,5 +1,29 @@
 import { expect, test } from "@playwright/test";
 
+function buildPdf(): Buffer {
+  const content = "BT /F1 18 Tf 40 120 Td (Study OS PDF) Tj ET\n";
+  const objects = [
+    "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
+    "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
+    "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 320 200] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n",
+    `4 0 obj\n<< /Length ${Buffer.byteLength(content)} >>\nstream\n${content}endstream\nendobj\n`,
+    "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n",
+  ];
+  let pdf = "%PDF-1.4\n";
+  const offsets: number[] = [];
+  for (const object of objects) {
+    offsets.push(Buffer.byteLength(pdf));
+    pdf += object;
+  }
+  const xrefStart = Buffer.byteLength(pdf);
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (const offset of offsets) {
+    pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
+  }
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF\n`;
+  return Buffer.from(pdf, "ascii");
+}
+
 test.describe("Study OS notes, focus and files", () => {
   test("records a note, a focus session and an uploaded file", async ({ page }) => {
     await page.goto("/zh-CN");
@@ -77,5 +101,43 @@ test.describe("Study OS notes, focus and files", () => {
 
     await page.reload();
     await expect(page.getByRole("button", { name: "恢复" })).toBeVisible();
+  });
+
+  test("opens a PDF and saves an annotation", async ({ page }) => {
+    await page.goto("/zh-CN");
+    const unavailable = page.getByText("数据库未配置");
+    if (await unavailable.isVisible().catch(() => false)) {
+      test.skip(true, "PostgreSQL is not configured in this environment");
+    }
+
+    const suffix = Date.now();
+    const spaceName = `PDF空间-${suffix}`;
+    await page.getByLabel("空间名称，例如：高等数学").fill(spaceName);
+    await page.getByRole("button", { name: "创建空间" }).click();
+    await page.getByRole("link", { name: new RegExp(spaceName) }).click();
+    await expect(page).toHaveURL(/\/spaces\/[0-9a-f-]+$/);
+
+    await page.getByLabel("选择文件").setInputFiles({
+      name: "paper.pdf",
+      mimeType: "application/pdf",
+      buffer: buildPdf(),
+    });
+    await page.getByRole("button", { name: "上传文件" }).click();
+    await expect(page.getByRole("link", { name: "paper.pdf" })).toBeVisible();
+
+    await page.getByRole("button", { name: "查看 / 标注" }).click();
+    await expect(page.locator("canvas")).toBeVisible({ timeout: 30_000 });
+    await expect
+      .poll(() => page.locator("canvas").evaluate((canvas) => (canvas as HTMLCanvasElement).width), {
+        timeout: 30_000,
+      })
+      .toBeGreaterThan(0);
+
+    await page.locator("canvas").click({ position: { x: 60, y: 60 } });
+    await page.getByLabel("标注笔记（可选）").fill("重点定义");
+    await page.getByRole("button", { name: "保存标注" }).click();
+    await expect(page.getByText("重点定义")).toBeVisible();
+
+    await page.screenshot({ path: "test-results/pdf-annotation.png", fullPage: true });
   });
 });
