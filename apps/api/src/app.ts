@@ -10,6 +10,7 @@ import Fastify, {
 import { apiErrorCodes } from "@study-os/contracts";
 
 import { createAiProvider, type AiProvider } from "./ai/provider";
+import { createLocalEmbedder, type Embedder } from "./rag/embedder";
 import type { ApiConfig } from "./config";
 import { openDatabase } from "./db";
 import { sendError } from "./http/errors";
@@ -25,6 +26,7 @@ import { knowledgeRoutes } from "./routes/knowledge";
 import { learningLogRoutes } from "./routes/learning-log";
 import { noteRoutes } from "./routes/notes";
 import { questionRoutes } from "./routes/questions";
+import { ragRoutes } from "./routes/rag";
 import { spaceRoutes } from "./routes/spaces";
 import { statsRoutes } from "./routes/stats";
 import { syncRoutes } from "./routes/sync";
@@ -32,6 +34,7 @@ import { taskRoutes } from "./routes/tasks";
 
 export interface AppDependencies {
   aiProvider?: AiProvider | null;
+  embedder?: Embedder;
 }
 
 export async function buildApp(
@@ -106,6 +109,9 @@ export async function buildApp(
   await app.register(questionRoutes);
   await app.register(assessmentRoutes);
   await app.register(knowledgeRoutes);
+  await app.register(ragRoutes, {
+    embedder: deps.embedder ?? createLocalEmbedder(),
+  });
 
   return app;
 }

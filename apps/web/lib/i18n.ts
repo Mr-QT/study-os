@@ -136,6 +136,12 @@ export const dictionary = {
     examScore: "得分",
     examAverage: "平均分",
     examNoQuestions: "先到题库添加题目，才能创建考试。",
+    semanticTitle: "知识检索",
+    semanticPlaceholder: "用自然语言搜索笔记和题目，例如：极限的定义",
+    semanticSearch: "搜索",
+    semanticReindex: "重建索引",
+    semanticEmpty: "没有找到相关内容。先点“重建索引”。",
+    semanticReindexed: "索引已更新",
   },
   en: {
     appName: "Study OS",
@@ -265,6 +271,12 @@ export const dictionary = {
     examScore: "Score",
     examAverage: "Average",
     examNoQuestions: "Add questions to the bank before creating an exam.",
+    semanticTitle: "Knowledge search",
+    semanticPlaceholder: "Search notes and questions in natural language",
+    semanticSearch: "Search",
+    semanticReindex: "Rebuild index",
+    semanticEmpty: "Nothing found. Try rebuilding the index first.",
+    semanticReindexed: "Index updated",
   },
 } as const satisfies Record<Locale, unknown>;
 

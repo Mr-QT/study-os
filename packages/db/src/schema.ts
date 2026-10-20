@@ -440,6 +440,28 @@ export const pdfAnnotations = pgTable(
   ],
 );
 
+export const ragSourceEnum = pgEnum("rag_source", ["note", "question"]);
+
+export const knowledgeChunks = pgTable(
+  "knowledge_chunks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    sourceType: ragSourceEnum("source_type").notNull(),
+    sourceId: uuid("source_id").notNull(),
+    chunkIndex: integer("chunk_index").notNull().default(0),
+    content: text("content").notNull(),
+    embedding: text("embedding").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("chunks_space_idx").on(table.spaceId),
+    index("chunks_source_idx").on(table.sourceType, table.sourceId),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -461,3 +483,4 @@ export type ExamRow = typeof exams.$inferSelect;
 export type ExamQuestionRow = typeof examQuestions.$inferSelect;
 export type ExamAttemptRow = typeof examAttempts.$inferSelect;
 export type PdfAnnotationRow = typeof pdfAnnotations.$inferSelect;
+export type KnowledgeChunkRow = typeof knowledgeChunks.$inferSelect;

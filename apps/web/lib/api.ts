@@ -17,6 +17,8 @@ export const QUESTIONS_ENDPOINT = `${API_BASE_URL}/api/v1/questions`;
 export const REVIEW_QUEUE_ENDPOINT = `${API_BASE_URL}/api/v1/review/queue`;
 export const EXAMS_ENDPOINT = `${API_BASE_URL}/api/v1/exams`;
 export const EXAM_ATTEMPTS_ENDPOINT = `${API_BASE_URL}/api/v1/exam-attempts`;
+export const SEMANTIC_SEARCH_ENDPOINT = `${API_BASE_URL}/api/v1/search/semantic`;
+export const RAG_REINDEX_ENDPOINT = `${API_BASE_URL}/api/v1/rag/reindex`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -100,4 +102,8 @@ export function examAttemptsStartEndpoint(examId: string): string {
 
 export function examAttemptEndpoint(attemptId: string): string {
   return `${EXAM_ATTEMPTS_ENDPOINT}/${attemptId}/submit`;
+}
+
+export function semanticSearchEndpoint(spaceId: string, query: string): string {
+  return `${SEMANTIC_SEARCH_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}&q=${encodeURIComponent(query)}`;
 }

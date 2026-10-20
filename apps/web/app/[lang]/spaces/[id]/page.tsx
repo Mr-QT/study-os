@@ -117,6 +117,12 @@ export default async function SpacePage({
             examScore: dict.examScore,
             examAverage: dict.examAverage,
             examNoQuestions: dict.examNoQuestions,
+            semanticTitle: dict.semanticTitle,
+            semanticPlaceholder: dict.semanticPlaceholder,
+            semanticSearch: dict.semanticSearch,
+            semanticReindex: dict.semanticReindex,
+            semanticEmpty: dict.semanticEmpty,
+            semanticReindexed: dict.semanticReindexed,
             fileDelete: dict.fileDelete,
             fileHint: dict.fileHint,
           }}

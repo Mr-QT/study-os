@@ -687,3 +687,22 @@ export const createPdfAnnotationInputSchema = z.object({
 export const pdfAnnotationListResponseSchema = z.object({
   annotations: z.array(pdfAnnotationSchema),
 });
+
+export const semanticSearchResultSchema = z.object({
+  sourceType: z.enum(["note", "question"]),
+  sourceId: z.string().min(1),
+  title: z.string().min(1),
+  snippet: z.string(),
+  score: z.number(),
+});
+export type SemanticSearchResult = z.infer<typeof semanticSearchResultSchema>;
+
+export const semanticSearchResponseSchema = z.object({
+  results: z.array(semanticSearchResultSchema),
+});
+
+export const ragReindexResponseSchema = z.object({
+  notes: z.number().int().nonnegative(),
+  questions: z.number().int().nonnegative(),
+  chunks: z.number().int().nonnegative(),
+});

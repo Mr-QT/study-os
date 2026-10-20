@@ -50,6 +50,13 @@
       "when": 1792504204839,
       "tag": "0006_yellow_slipstream",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792504545924,
+      "tag": "0007_striped_madrox",
+      "breakpoints": true
     }
   ]
 }

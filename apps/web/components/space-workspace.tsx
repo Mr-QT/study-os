@@ -10,6 +10,7 @@ import { FilesPanel } from "@/components/files-panel";
 import { FocusPanel } from "@/components/focus-panel";
 import { NotesPanel } from "@/components/notes-panel";
 import { QuestionsPanel } from "@/components/questions-panel";
+import { SemanticSearchPanel } from "@/components/semantic-search-panel";
 import { StatsPanel } from "@/components/stats-panel";
 
 import {
@@ -113,6 +114,12 @@ export interface SpaceLabels {
   examScore: string;
   examAverage: string;
   examNoQuestions: string;
+  semanticTitle: string;
+  semanticPlaceholder: string;
+  semanticSearch: string;
+  semanticReindex: string;
+  semanticEmpty: string;
+  semanticReindexed: string;
 }
 
 const jsonHeaders = { "content-type": "application/json", accept: "application/json" };
@@ -584,6 +591,18 @@ export function SpaceWorkspace({
           hint: labels.fileHint,
         }}
       />
+      <SemanticSearchPanel
+        spaceId={spaceId}
+        labels={{
+          title: labels.semanticTitle,
+          placeholder: labels.semanticPlaceholder,
+          search: labels.semanticSearch,
+          reindex: labels.semanticReindex,
+          empty: labels.semanticEmpty,
+          reindexed: labels.semanticReindexed,
+        }}
+      />
+
       <ExamsPanel
         spaceId={spaceId}
         labels={{

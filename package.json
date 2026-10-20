@@ -29,7 +29,9 @@
       "esbuild",
       "sharp",
       "@tailwindcss/oxide",
-      "unrs-resolver"
+      "unrs-resolver",
+      "onnxruntime-node",
+      "protobufjs"
     ]
   },
   "devDependencies": {
