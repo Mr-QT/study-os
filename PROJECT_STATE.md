@@ -9,7 +9,7 @@
 - 部署状态：未部署
 - 数据库：PostgreSQL 16（Docker Compose，容器 `study-os-postgres`，持久卷 `studyos-pgdata`），12 张表，迁移 0000–0004 已应用
 - 已确认技术基线：见 `docs/adr/`（全部为 Proposed，待批准）
-- 最近 commit：`159ec8d`
+- 最近 commit：`2a2dadf`
 
 ## 环境（实测）
 
