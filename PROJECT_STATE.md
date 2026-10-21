@@ -1,11 +1,11 @@
 # PROJECT_STATE — 真实项目状态
 
 - 日期：2026-10-21
-- 当前阶段：4 — 智能日程与自动化（4.1/4.2 完成）
-- 当前里程碑：4.1 规则/通知中心；4.2 worker、focus/exam 事件、延迟/去重、AI 规则草案、冲突重试、空间页无障碍
+- 当前阶段：4 — 智能日程与自动化（4.1/4.2/4.3 完成）
+- 当前里程碑：4.3 重复事件、事件提醒、免打扰时段、每日摘要与偏好设置
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 81 通过（contracts 10、api 71）；Playwright 13 通过
-- 数据库：PostgreSQL 16（Docker Compose，持久卷），25 张表，迁移 0000–0010
+- 测试结果：单元/集成 92 通过（contracts 10、api 82）；Playwright 13 通过
+- 数据库：PostgreSQL 16（Docker Compose，持久卷），26 张表，迁移 0000–0012
 - 部署状态：未部署
 - 最近 commit：`8651529`
 
@@ -26,7 +26,7 @@
 | 命令 | 结果 |
 |---|---|
 | `pnpm lint` / `typecheck` / `build` | 通过 |
-| `pnpm test` | 81 passed（contracts 10、api 71） |
+| `pnpm test` | 92 passed（contracts 10、api 82） |
 | `pnpm test:e2e` | 13 passed（新增空间页 axe 无障碍） |
 | `pnpm worker` | 启动成功，冒烟一次发送 4 条到期通知 |
 
@@ -42,6 +42,7 @@
   - 任务 409 冲突自动按最新版本重试一次，失败才提示冲突；
   - 空间详情页 axe WCAG A/AA 回归；
   - **存储适配**：本地磁盘与 S3 兼容对象存储统一 `StorageAdapter`，文件上传/下载/删除走适配器；默认本地，S3 需 `STORAGE_DRIVER=s3` 与凭据；S3 路径尚未做真实 MinIO 集成测试。
+  - **4.3 高级日历与通知**：重复事件（daily/weekly + recurrenceUntil）、事件提前提醒（0–10080 分钟、自动去重、更新/删除时重排）、免打扰时段顺延、每日摘要（可配置小时、按天去重）、偏好设置 API 与 UI；worker 每小时检查摘要候选。
 
 ## 未完成项
 

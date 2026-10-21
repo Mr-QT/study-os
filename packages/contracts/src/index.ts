@@ -255,6 +255,9 @@ export const calendarEventSchema = z.object({
   sourceType: z.enum(["manual", "task", "course"]),
   sourceId: z.string().nullable(),
   locked: z.boolean(),
+  recurrence: z.enum(["none", "daily", "weekly"]),
+  recurrenceUntil: z.string().nullable(),
+  reminderMinutes: z.number().int().min(0).max(10080).nullable(),
   createdAt: z.string().min(1),
   updatedAt: z.string().min(1),
 });
@@ -267,11 +270,43 @@ export const createCalendarEventInputSchema = z
     startsAt: isoDateTimeSchema,
     endsAt: isoDateTimeSchema,
     timezone: z.string().trim().min(1).max(60).optional(),
+    recurrence: z.enum(["none", "daily", "weekly"]).optional(),
+    recurrenceUntil: isoDateTimeSchema.optional(),
+    reminderMinutes: z.number().int().min(0).max(10080).optional(),
   })
   .refine((value) => Date.parse(value.endsAt) > Date.parse(value.startsAt), {
     message: "结束时间必须晚于开始时间",
-  });
+  })
+  .refine(
+    (value) =>
+      !value.recurrenceUntil || Date.parse(value.recurrenceUntil) > Date.parse(value.startsAt),
+    { message: "重复结束时间必须晚于开始时间" },
+  );
 export type CreateCalendarEventInput = z.infer<typeof createCalendarEventInputSchema>;
+
+export const updateCalendarEventInputSchema = z
+  .object({
+    title: z.string().trim().min(1).max(200).optional(),
+    startsAt: isoDateTimeSchema.optional(),
+    endsAt: isoDateTimeSchema.optional(),
+    timezone: z.string().trim().min(1).max(60).optional(),
+    recurrence: z.enum(["none", "daily", "weekly"]).optional(),
+    recurrenceUntil: isoDateTimeSchema.nullable().optional(),
+    reminderMinutes: z.number().int().min(0).max(10080).nullable().optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, { message: "至少需要一个字段" });
+export type UpdateCalendarEventInput = z.infer<typeof updateCalendarEventInputSchema>;
+
+export const calendarOccurrenceSchema = z.object({
+  eventId: z.string().min(1),
+  title: z.string().min(1),
+  startsAt: z.string().min(1),
+  endsAt: z.string().min(1),
+  timezone: z.string().min(1),
+  recurrence: z.enum(["none", "daily", "weekly"]),
+  sourceType: z.enum(["manual", "task", "course"]),
+});
+export type CalendarOccurrence = z.infer<typeof calendarOccurrenceSchema>;
 
 export const calendarEventQuerySchema = z.object({
   spaceId: z.string().uuid(),
@@ -283,6 +318,9 @@ export const termListResponseSchema = z.object({ terms: z.array(termSchema) });
 export const courseListResponseSchema = z.object({ courses: z.array(courseSchema) });
 export const taskListResponseSchema = z.object({ tasks: z.array(taskSchema) });
 export const calendarEventListResponseSchema = z.object({ events: z.array(calendarEventSchema) });
+export const calendarOccurrenceListResponseSchema = z.object({
+  occurrences: z.array(calendarOccurrenceSchema),
+});
 
 export const termResponseSchema = z.object({ term: termSchema });
 export const courseResponseSchema = z.object({ course: courseSchema });
@@ -973,6 +1011,35 @@ export const dispatchResponseSchema = z.object({
   sent: z.number().int().nonnegative(),
   skipped: z.number().int().nonnegative(),
   failed: z.number().int().nonnegative(),
+});
+
+export const notificationPreferenceSchema = z.object({
+  timezone: z.string().min(1),
+  quietStartHour: z.number().int().min(0).max(23),
+  quietEndHour: z.number().int().min(0).max(23),
+  digestHour: z.number().int().min(0).max(23),
+  digestEnabled: z.boolean(),
+  updatedAt: z.string().min(1),
+});
+export type NotificationPreferenceDto = z.infer<typeof notificationPreferenceSchema>;
+
+export const updateNotificationPreferenceInputSchema = z
+  .object({
+    timezone: z.string().trim().min(1).max(60).optional(),
+    quietStartHour: z.number().int().min(0).max(23).optional(),
+    quietEndHour: z.number().int().min(0).max(23).optional(),
+    digestHour: z.number().int().min(0).max(23).optional(),
+    digestEnabled: z.boolean().optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, { message: "至少需要一个字段" });
+
+export const notificationPreferenceResponseSchema = z.object({
+  preferences: notificationPreferenceSchema,
+});
+
+export const digestResponseSchema = z.object({
+  created: z.boolean(),
+  notification: notificationSchema.nullable(),
 });
 
 export const ruleDraftInputSchema = z.object({

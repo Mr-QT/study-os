@@ -4,6 +4,7 @@ import { createDb, createPool } from "@study-os/db";
 import { config as loadEnv } from "dotenv";
 
 import { dispatchDueNotifications } from "./notifications/dispatch";
+import { createDigest, digestCandidates } from "./notifications/preferences";
 
 loadEnv({ path: fileURLToPath(new URL("../../../.env", import.meta.url)), quiet: true });
 
@@ -18,6 +19,11 @@ const db = createDb(pool);
 
 async function tick(): Promise<void> {
   try {
+    const candidates = await digestCandidates(db);
+    for (const userId of candidates) {
+      const digest = await createDigest(db, userId);
+      if (digest) console.log(`[worker] digest queued for ${userId}`);
+    }
     const result = await dispatchDueNotifications(db);
     if (result.sent > 0 || result.skipped > 0) {
       console.log(

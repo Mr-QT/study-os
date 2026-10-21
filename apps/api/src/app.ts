@@ -30,6 +30,7 @@ import { knowledgeRoutes } from "./routes/knowledge";
 import { learningLogRoutes } from "./routes/learning-log";
 import { memoryRoutes } from "./routes/memories";
 import { extractRoutes } from "./routes/extract";
+import { notificationPreferenceRoutes } from "./routes/notification-preferences";
 import { planRoutes } from "./routes/plans";
 import { noteRoutes } from "./routes/notes";
 import { questionRoutes } from "./routes/questions";
@@ -131,6 +132,7 @@ export async function buildApp(
   await app.register(learningRoutes);
   await app.register(taskRoutes);
   await app.register(calendarRoutes);
+  await app.register(notificationPreferenceRoutes);
   await app.register(noteRoutes);
   await app.register(focusRoutes);
   await app.register(fileRoutes, { storage });

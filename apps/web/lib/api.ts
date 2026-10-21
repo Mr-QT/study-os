@@ -29,6 +29,8 @@ export const AUTOMATION_RULES_DRAFT_ENDPOINT = `${AUTOMATION_RULES_ENDPOINT}/dra
 export const AUTOMATION_RUNS_ENDPOINT = `${API_BASE_URL}/api/v1/automation/runs`;
 export const NOTIFICATIONS_ENDPOINT = `${API_BASE_URL}/api/v1/notifications`;
 export const NOTIFICATIONS_DISPATCH_ENDPOINT = `${NOTIFICATIONS_ENDPOINT}/dispatch`;
+export const NOTIFICATION_PREFERENCES_ENDPOINT = `${NOTIFICATIONS_ENDPOINT}/preferences`;
+export const NOTIFICATION_DIGEST_ENDPOINT = `${NOTIFICATIONS_ENDPOINT}/digest`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;

@@ -28,6 +28,7 @@ export const membershipRoleEnum = pgEnum("membership_role", ["owner", "editor", 
 export const taskStatusEnum = pgEnum("task_status", ["todo", "in_progress", "done", "archived"]);
 export const taskPriorityEnum = pgEnum("task_priority", ["low", "medium", "high"]);
 export const calendarSourceEnum = pgEnum("calendar_source", ["manual", "task", "course"]);
+export const recurrenceEnum = pgEnum("calendar_recurrence", ["none", "daily", "weekly"]);
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -148,6 +149,7 @@ export const calendarEvents = pgTable(
     spaceId: uuid("space_id")
       .notNull()
       .references(() => spaces.id, { onDelete: "cascade" }),
+    createdBy: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
     title: text("title").notNull(),
     startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
     endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
@@ -155,6 +157,9 @@ export const calendarEvents = pgTable(
     sourceType: calendarSourceEnum("source_type").notNull().default("manual"),
     sourceId: uuid("source_id"),
     locked: boolean("locked").notNull().default(false),
+    recurrence: recurrenceEnum("recurrence").notNull().default("none"),
+    recurrenceUntil: timestamp("recurrence_until", { withTimezone: true }),
+    reminderMinutes: integer("reminder_minutes"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -596,6 +601,18 @@ export const notifications = pgTable(
   ],
 );
 
+export const notificationPreferences = pgTable("notification_preferences", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  timezone: text("timezone").notNull().default("Asia/Shanghai"),
+  quietStartHour: integer("quiet_start_hour").notNull().default(22),
+  quietEndHour: integer("quiet_end_hour").notNull().default(8),
+  digestHour: integer("digest_hour").notNull().default(20),
+  digestEnabled: boolean("digest_enabled").notNull().default(false),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -623,3 +640,4 @@ export type LearningPlanRow = typeof learningPlans.$inferSelect;
 export type AutomationRuleRow = typeof automationRules.$inferSelect;
 export type AutomationRunRow = typeof automationRuns.$inferSelect;
 export type NotificationRow = typeof notifications.$inferSelect;
+export type NotificationPreferenceRow = typeof notificationPreferences.$inferSelect;

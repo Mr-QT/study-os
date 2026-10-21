@@ -4,6 +4,7 @@ import type {
   AutomationRuleDto,
   AutomationRunDto,
   NotificationDto,
+  NotificationPreferenceDto,
   RuleDraft,
 } from "@study-os/contracts";
 import { useCallback, useEffect, useState } from "react";
@@ -11,6 +12,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   AUTOMATION_RULES_DRAFT_ENDPOINT,
   AUTOMATION_RULES_ENDPOINT,
+  NOTIFICATION_DIGEST_ENDPOINT,
+  NOTIFICATION_PREFERENCES_ENDPOINT,
   NOTIFICATIONS_DISPATCH_ENDPOINT,
   automationRuleEndpoint,
   automationRulesEndpoint,
@@ -42,6 +45,15 @@ const TEXT = {
     dispatch: "发送待处理通知",
     markRead: "标为已读",
     unread: "未读",
+    prefsTitle: "免打扰与摘要",
+    quietStart: "免打扰开始（小时）",
+    quietEnd: "免打扰结束（小时）",
+    digestHour: "摘要时间（小时）",
+    digestEnabled: "启用每日摘要",
+    savePrefs: "保存偏好",
+    digestNow: "生成今日摘要",
+    digestCreated: "摘要已生成。",
+    digestSkipped: "今天已有摘要。",
   },
   en: {
     title: "Automation and notifications",
@@ -65,6 +77,15 @@ const TEXT = {
     dispatch: "Dispatch pending",
     markRead: "Mark read",
     unread: "unread",
+    prefsTitle: "Quiet hours and digest",
+    quietStart: "Quiet start (hour)",
+    quietEnd: "Quiet end (hour)",
+    digestHour: "Digest hour",
+    digestEnabled: "Enable daily digest",
+    savePrefs: "Save preferences",
+    digestNow: "Create today's digest",
+    digestCreated: "Digest created.",
+    digestSkipped: "Digest already exists today.",
   },
 } as const;
 
@@ -80,12 +101,16 @@ export function AutomationPanel({ spaceId, locale }: { spaceId: string; locale: 
   const [draft, setDraft] = useState<RuleDraft | null>(null);
   const [draftError, setDraftError] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [prefs, setPrefs] = useState<NotificationPreferenceDto | null>(null);
+  const [prefsBusy, setPrefsBusy] = useState(false);
+  const [digestMessage, setDigestMessage] = useState("");
 
   const load = useCallback(async () => {
-    const [rulesResponse, runsResponse, notificationsResponse] = await Promise.all([
+    const [rulesResponse, runsResponse, notificationsResponse, prefsResponse] = await Promise.all([
       fetch(automationRulesEndpoint(spaceId), { credentials: "include", headers: { accept: "application/json" } }),
       fetch(automationRunsEndpoint(spaceId), { credentials: "include", headers: { accept: "application/json" } }),
       fetch(notificationsEndpoint(spaceId), { credentials: "include", headers: { accept: "application/json" } }),
+      fetch(NOTIFICATION_PREFERENCES_ENDPOINT, { credentials: "include", headers: { accept: "application/json" } }),
     ]);
     if (rulesResponse.ok) {
       setRules(((await rulesResponse.json()) as { rules: AutomationRuleDto[] }).rules);
@@ -100,6 +125,11 @@ export function AutomationPanel({ spaceId, locale }: { spaceId: string; locale: 
       };
       setNotifications(body.notifications);
       setUnread(body.unread);
+    }
+    if (prefsResponse.ok) {
+      setPrefs(
+        ((await prefsResponse.json()) as { preferences: NotificationPreferenceDto }).preferences,
+      );
     }
   }, [spaceId]);
 
@@ -201,6 +231,42 @@ export function AutomationPanel({ spaceId, locale }: { spaceId: string; locale: 
     },
     [load],
   );
+
+  const savePrefs = useCallback(async () => {
+    if (!prefs || prefsBusy) return;
+    setPrefsBusy(true);
+    try {
+      const response = await fetch(NOTIFICATION_PREFERENCES_ENDPOINT, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify({
+          quietStartHour: prefs.quietStartHour,
+          quietEndHour: prefs.quietEndHour,
+          digestHour: prefs.digestHour,
+          digestEnabled: prefs.digestEnabled,
+        }),
+      });
+      if (response.ok) {
+        const body = (await response.json()) as { preferences: NotificationPreferenceDto };
+        setPrefs(body.preferences);
+      }
+    } finally {
+      setPrefsBusy(false);
+    }
+  }, [prefs, prefsBusy]);
+
+  const createDigestNow = useCallback(async () => {
+    const response = await fetch(NOTIFICATION_DIGEST_ENDPOINT, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (response.ok) {
+      const body = (await response.json()) as { created: boolean };
+      setDigestMessage(body.created ? text.digestCreated : text.digestSkipped);
+      await load();
+    }
+  }, [load, text.digestCreated, text.digestSkipped]);
 
   return (
     <section className="rounded-2xl border border-line bg-surface p-6">
@@ -351,6 +417,77 @@ export function AutomationPanel({ spaceId, locale }: { spaceId: string; locale: 
           ))}
         </ul>
       )}
+
+      <h4 className="mt-4 text-sm font-semibold text-muted">{text.prefsTitle}</h4>
+      {prefs ? (
+        <div className="mt-2 flex flex-col gap-2">
+          <div className="flex flex-wrap items-end gap-2 text-xs text-muted">
+            <label>
+              {text.quietStart}
+              <input
+                type="number"
+                min={0}
+                max={23}
+                value={prefs.quietStartHour}
+                onChange={(event) =>
+                  setPrefs({ ...prefs, quietStartHour: Number(event.target.value) })
+                }
+                className="ml-1 w-16 rounded-lg border border-line bg-canvas px-2 py-1 text-sm text-ink"
+              />
+            </label>
+            <label>
+              {text.quietEnd}
+              <input
+                type="number"
+                min={0}
+                max={23}
+                value={prefs.quietEndHour}
+                onChange={(event) =>
+                  setPrefs({ ...prefs, quietEndHour: Number(event.target.value) })
+                }
+                className="ml-1 w-16 rounded-lg border border-line bg-canvas px-2 py-1 text-sm text-ink"
+              />
+            </label>
+            <label>
+              {text.digestHour}
+              <input
+                type="number"
+                min={0}
+                max={23}
+                value={prefs.digestHour}
+                onChange={(event) => setPrefs({ ...prefs, digestHour: Number(event.target.value) })}
+                className="ml-1 w-16 rounded-lg border border-line bg-canvas px-2 py-1 text-sm text-ink"
+              />
+            </label>
+            <label className="flex items-center gap-1">
+              <input
+                type="checkbox"
+                checked={prefs.digestEnabled}
+                onChange={(event) => setPrefs({ ...prefs, digestEnabled: event.target.checked })}
+              />
+              {text.digestEnabled}
+            </label>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => void savePrefs()}
+              disabled={prefsBusy}
+              className="rounded-lg bg-accent-ink px-3 py-1.5 text-xs font-medium text-canvas disabled:opacity-50"
+            >
+              {text.savePrefs}
+            </button>
+            <button
+              type="button"
+              onClick={() => void createDigestNow()}
+              className="rounded-lg border border-line px-3 py-1.5 text-xs hover:border-accent"
+            >
+              {text.digestNow}
+            </button>
+          </div>
+          {digestMessage ? <p className="text-xs text-ok">{digestMessage}</p> : null}
+        </div>
+      ) : null}
     </section>
   );
 }

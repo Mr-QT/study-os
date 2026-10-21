@@ -127,7 +127,8 @@ export function toFileAssetDto(row: FileAssetRow): FileAssetDto {
   };
 }
 
-export function toCalendarEventDto(row: CalendarEventRow): CalendarEventDto {  return {
+export function toCalendarEventDto(row: CalendarEventRow): CalendarEventDto {
+  return {
     id: row.id,
     spaceId: row.spaceId,
     title: row.title,
@@ -137,6 +138,9 @@ export function toCalendarEventDto(row: CalendarEventRow): CalendarEventDto {  r
     sourceType: row.sourceType,
     sourceId: row.sourceId,
     locked: row.locked,
+    recurrence: row.recurrence,
+    recurrenceUntil: row.recurrenceUntil?.toISOString() ?? null,
+    reminderMinutes: row.reminderMinutes,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };

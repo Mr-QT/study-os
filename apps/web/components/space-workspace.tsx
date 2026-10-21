@@ -54,6 +54,12 @@ export interface SpaceLabels {
   eventCreate: string;
   eventCreating: string;
   eventInvalidRange: string;
+  eventRecurrence: string;
+  recurrenceNone: string;
+  recurrenceDaily: string;
+  recurrenceWeekly: string;
+  eventReminder: string;
+  eventReminderHint: string;
   notesTitle: string;
   notesEmpty: string;
   noteTitlePlaceholder: string;
@@ -163,6 +169,8 @@ export function SpaceWorkspace({
   const [pendingChanges, setPendingChanges] = useState(0);
 
   const [eventTitle, setEventTitle] = useState("");
+  const [eventRecurrence, setEventRecurrence] = useState<"none" | "daily" | "weekly">("none");
+  const [eventReminder, setEventReminder] = useState("");
   const [eventStart, setEventStart] = useState("");
   const [eventEnd, setEventEnd] = useState("");
   const [eventBusy, setEventBusy] = useState(false);
@@ -376,6 +384,10 @@ export function SpaceWorkspace({
             title,
             startsAt: new Date(eventStart).toISOString(),
             endsAt: new Date(eventEnd).toISOString(),
+            recurrence: eventRecurrence,
+            ...(eventReminder.trim() === ""
+              ? {}
+              : { reminderMinutes: Number(eventReminder) }),
           }),
         });
         if (!response.ok) {
@@ -387,13 +399,15 @@ export function SpaceWorkspace({
         setEventTitle("");
         setEventStart("");
         setEventEnd("");
+        setEventRecurrence("none");
+        setEventReminder("");
       } catch {
         setEventError(labels.eventInvalidRange);
       } finally {
         setEventBusy(false);
       }
     },
-    [eventBusy, eventEnd, eventStart, eventTitle, labels.eventInvalidRange, spaceId],
+    [eventBusy, eventEnd, eventRecurrence, eventReminder, eventStart, eventTitle, labels.eventInvalidRange, spaceId],
   );
 
   if (state === "loading") {
@@ -562,6 +576,34 @@ export function SpaceWorkspace({
               {eventBusy ? labels.eventCreating : labels.eventCreate}
             </button>
           </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <label className="flex-1 text-xs text-muted">
+              {labels.eventRecurrence}
+              <select
+                value={eventRecurrence}
+                onChange={(event) =>
+                  setEventRecurrence(event.target.value as "none" | "daily" | "weekly")
+                }
+                className="mt-1 w-full rounded-xl border border-line bg-canvas px-3 py-2 text-sm text-ink"
+              >
+                <option value="none">{labels.recurrenceNone}</option>
+                <option value="daily">{labels.recurrenceDaily}</option>
+                <option value="weekly">{labels.recurrenceWeekly}</option>
+              </select>
+            </label>
+            <label className="flex-1 text-xs text-muted">
+              {labels.eventReminder}
+              <input
+                type="number"
+                min={0}
+                max={10080}
+                value={eventReminder}
+                onChange={(event) => setEventReminder(event.target.value)}
+                placeholder={labels.eventReminderHint}
+                className="mt-1 w-full rounded-xl border border-line bg-canvas px-3 py-2 text-sm text-ink"
+              />
+            </label>
+          </div>
         </form>
         {eventError ? <p role="alert" className="mt-2 text-xs text-danger">{eventError}</p> : null}
         {events.length === 0 ? (
@@ -570,7 +612,16 @@ export function SpaceWorkspace({
           <ul className="mt-4 flex flex-col gap-2">
             {events.map((event) => (
               <li key={event.id} className="rounded-xl border border-line bg-canvas px-4 py-3">
-                <p className="font-medium">{event.title}</p>
+                <p className="font-medium">
+                  {event.title}
+                  {event.recurrence !== "none" ? (
+                    <span className="ml-2 rounded-full border border-line px-2 py-0.5 text-xs text-muted">
+                      {event.recurrence === "daily"
+                        ? labels.recurrenceDaily
+                        : labels.recurrenceWeekly}
+                    </span>
+                  ) : null}
+                </p>
                 <p className="text-xs text-muted">
                   {new Date(event.startsAt).toLocaleString()} – {new Date(event.endsAt).toLocaleTimeString()}
                 </p>
