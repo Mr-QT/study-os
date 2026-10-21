@@ -23,6 +23,7 @@ blob-report/
 
 # local uploads
 storage/
+test-storage/
 
 # tooling caches
 .turbo/
