@@ -168,4 +168,30 @@ test.describe("Study OS notes, focus and files", () => {
 
     await page.screenshot({ path: "test-results/growth.png", fullPage: true });
   });
+
+  test("imports tasks from CSV with preview and commit", async ({ page }) => {
+    await page.goto("/zh-CN");
+    const unavailable = page.getByText("数据库未配置");
+    if (await unavailable.isVisible().catch(() => false)) {
+      test.skip(true, "PostgreSQL is not configured in this environment");
+    }
+
+    const suffix = Date.now();
+    const spaceName = `迁移空间-${suffix}`;
+    await page.getByLabel("空间名称，例如：高等数学").fill(spaceName);
+    await page.getByRole("button", { name: "创建空间" }).click();
+    await page.getByRole("link", { name: new RegExp(spaceName) }).click();
+    await expect(page).toHaveURL(/\/spaces\/[0-9a-f-]+$/);
+
+    await page
+      .getByLabel("或直接粘贴 CSV，第一行必须是表头")
+      .fill(`title,notes\nCSV任务-${suffix},来自端到端\n`);
+    await page.getByRole("button", { name: "预览" }).click();
+    await expect(page.getByText(/共 1 行/)).toBeVisible();
+    await page.getByRole("button", { name: "确认导入" }).click();
+    await expect(page.getByText(/已创建 1 条/)).toBeVisible();
+    await expect(page.getByText(/committed/)).toBeVisible();
+
+    await page.screenshot({ path: "test-results/migration.png", fullPage: true });
+  });
 });

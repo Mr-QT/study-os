@@ -4,6 +4,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { AutomationPanel } from "@/components/automation-panel";
 import { GrowthPanel } from "@/components/growth-panel";
 import { InsightsPanel } from "@/components/insights-panel";
+import { MigrationPanel } from "@/components/migration-panel";
 import { PlansPanel } from "@/components/plans-panel";
 import { SpaceWorkspace } from "@/components/space-workspace";
 import { getDictionary, isLocale } from "@/lib/i18n";
@@ -152,6 +153,7 @@ export default async function SpacePage({
         <div className="mt-6 flex flex-col gap-6">
           <PlansPanel spaceId={id} locale={lang} />
           <GrowthPanel spaceId={id} locale={lang} />
+          <MigrationPanel spaceId={id} locale={lang} />
           <AutomationPanel spaceId={id} locale={lang} />
           <InsightsPanel spaceId={id} locale={lang} />
         </div>

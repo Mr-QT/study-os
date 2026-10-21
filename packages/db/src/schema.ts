@@ -686,6 +686,61 @@ export const habitCheckins = pgTable(
   (table) => [uniqueIndex("habit_checkin_unique").on(table.habitId, table.checkinDate)],
 );
 
+export const importKindEnum = pgEnum("import_kind", ["tasks", "questions"]);
+export const importStatusEnum = pgEnum("import_status", [
+  "previewed",
+  "committed",
+  "rolled_back",
+]);
+export const importItemStatusEnum = pgEnum("import_item_status", [
+  "pending",
+  "created",
+  "skipped",
+  "failed",
+]);
+
+export const importBatches = pgTable(
+  "import_batches",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: importKindEnum("kind").notNull(),
+    filename: text("filename").notNull(),
+    status: importStatusEnum("status").notNull().default("previewed"),
+    rawCsv: text("raw_csv").notNull(),
+    sha256: text("sha256").notNull(),
+    totalRows: integer("total_rows").notNull().default(0),
+    validRows: integer("valid_rows").notNull().default(0),
+    invalidRows: integer("invalid_rows").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    committedAt: timestamp("committed_at", { withTimezone: true }),
+    rolledBackAt: timestamp("rolled_back_at", { withTimezone: true }),
+  },
+  (table) => [index("import_batches_space_idx").on(table.spaceId)],
+);
+
+export const importItems = pgTable(
+  "import_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    batchId: uuid("batch_id")
+      .notNull()
+      .references(() => importBatches.id, { onDelete: "cascade" }),
+    rowNumber: integer("row_number").notNull(),
+    status: importItemStatusEnum("status").notNull().default("pending"),
+    entityId: uuid("entity_id"),
+    payload: text("payload").notNull(),
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("import_items_batch_idx").on(table.batchId)],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -717,3 +772,5 @@ export type NotificationPreferenceRow = typeof notificationPreferences.$inferSel
 export type LearningGoalRow = typeof learningGoals.$inferSelect;
 export type HabitRow = typeof habits.$inferSelect;
 export type HabitCheckinRow = typeof habitCheckins.$inferSelect;
+export type ImportBatchRow = typeof importBatches.$inferSelect;
+export type ImportItemRow = typeof importItems.$inferSelect;

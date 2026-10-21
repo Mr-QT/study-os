@@ -35,6 +35,7 @@ export const GOALS_ENDPOINT = `${API_BASE_URL}/api/v1/goals`;
 export const HABITS_ENDPOINT = `${API_BASE_URL}/api/v1/habits`;
 export const PROFILE_SUMMARY_ENDPOINT = `${API_BASE_URL}/api/v1/profile/summary`;
 export const PROFILE_EXPORT_ENDPOINT = `${API_BASE_URL}/api/v1/profile/export`;
+export const IMPORTS_ENDPOINT = `${API_BASE_URL}/api/v1/imports`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -190,4 +191,20 @@ export function profileSummaryEndpoint(spaceId: string): string {
 
 export function profileExportEndpoint(spaceId: string): string {
   return `${PROFILE_EXPORT_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function importsEndpoint(spaceId: string): string {
+  return `${IMPORTS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function importCommitEndpoint(batchId: string): string {
+  return `${IMPORTS_ENDPOINT}/${batchId}/commit`;
+}
+
+export function importRollbackEndpoint(batchId: string): string {
+  return `${IMPORTS_ENDPOINT}/${batchId}/rollback`;
+}
+
+export function importOriginalEndpoint(batchId: string): string {
+  return `${IMPORTS_ENDPOINT}/${batchId}/original`;
 }

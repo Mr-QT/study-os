@@ -1168,6 +1168,65 @@ export const profileExportResponseSchema = z.object({
   generatedAt: z.string().min(1),
 });
 
+/* ------------------------------------------------------------------ */
+/* Stage 5.2: import center                                            */
+/* ------------------------------------------------------------------ */
+
+export const importKindSchema = z.enum(["tasks", "questions"]);
+export type ImportKind = z.infer<typeof importKindSchema>;
+
+export const importStatusSchema = z.enum(["previewed", "committed", "rolled_back"]);
+
+export const importBatchSchema = z.object({
+  id: z.string().min(1),
+  kind: importKindSchema,
+  filename: z.string().min(1),
+  status: importStatusSchema,
+  totalRows: z.number().int().nonnegative(),
+  validRows: z.number().int().nonnegative(),
+  invalidRows: z.number().int().nonnegative(),
+  sha256: z.string().min(1),
+  createdAt: z.string().min(1),
+  committedAt: z.string().nullable(),
+  rolledBackAt: z.string().nullable(),
+});
+export type ImportBatchDto = z.infer<typeof importBatchSchema>;
+
+export const importPreviewInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  kind: importKindSchema,
+  csv: z.string().min(1).max(1_000_000),
+  filename: z.string().trim().min(1).max(200).optional(),
+});
+
+export const importRowSchema = z.object({
+  rowNumber: z.number().int().positive(),
+  values: z.record(z.string(), z.string()),
+  valid: z.boolean(),
+  error: z.string().nullable(),
+});
+export type ImportRowPreview = z.infer<typeof importRowSchema>;
+
+export const importPreviewResponseSchema = z.object({
+  batch: importBatchSchema,
+  rows: z.array(importRowSchema),
+});
+
+export const importCommitResponseSchema = z.object({
+  batch: importBatchSchema,
+  created: z.number().int().nonnegative(),
+  skipped: z.number().int().nonnegative(),
+});
+
+export const importRollbackResponseSchema = z.object({
+  batch: importBatchSchema,
+  deleted: z.number().int().nonnegative(),
+});
+
+export const importBatchListResponseSchema = z.object({
+  batches: z.array(importBatchSchema),
+});
+
 export const ruleDraftInputSchema = z.object({
   spaceId: z.string().uuid(),
   text: z.string().trim().min(1).max(1000),
