@@ -8,7 +8,14 @@ export interface ApiConfig {
   databaseUrl: string | undefined;
   sessionSecret: string;
   secureCookies: boolean;
+  storageDriver?: "local" | "s3";
   storageDir: string;
+  s3Bucket?: string;
+  s3Region?: string;
+  s3Endpoint?: string;
+  s3AccessKeyId?: string;
+  s3SecretAccessKey?: string;
+  s3ForcePathStyle?: boolean;
   aiProvider?: string;
   aiBaseUrl?: string;
   aiApiKey?: string;
@@ -53,6 +60,21 @@ const DEVELOPMENT_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
   const isProduction = env.NODE_ENV === "production";
+  const storageDriver = (env.STORAGE_DRIVER?.trim().toLowerCase() || "local") as
+    | "local"
+    | "s3";
+  if (storageDriver !== "local" && storageDriver !== "s3") {
+    throw new Error(`Invalid STORAGE_DRIVER "${storageDriver}": expected local or s3`);
+  }
+  const s3Bucket = env.S3_BUCKET?.trim() || undefined;
+  const s3Region = env.S3_REGION?.trim() || undefined;
+  const s3AccessKeyId = env.S3_ACCESS_KEY_ID?.trim() || undefined;
+  const s3SecretAccessKey = env.S3_SECRET_ACCESS_KEY?.trim() || undefined;
+  if (storageDriver === "s3" && (!s3Bucket || !s3Region || !s3AccessKeyId || !s3SecretAccessKey)) {
+    throw new Error(
+      "STORAGE_DRIVER=s3 requires S3_BUCKET, S3_REGION, S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY",
+    );
+  }
   return {
     host: env.API_HOST?.trim() || "127.0.0.1",
     port: parsePort(env.API_PORT),
@@ -61,7 +83,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
     databaseUrl: env.DATABASE_URL?.trim() || undefined,
     sessionSecret: parseSessionSecret(env.SESSION_SECRET, isProduction),
     secureCookies: isProduction,
+    storageDriver,
     storageDir: env.STORAGE_DIR?.trim() || path.join(process.cwd(), "storage", "uploads"),
+    s3Bucket,
+    s3Region,
+    s3Endpoint: env.S3_ENDPOINT?.trim() || undefined,
+    s3AccessKeyId,
+    s3SecretAccessKey,
+    s3ForcePathStyle: env.S3_FORCE_PATH_STYLE === "true",
     aiProvider: (env.AI_PROVIDER?.trim().toLowerCase() || "disabled"),
     aiBaseUrl:
       env.AI_BASE_URL?.trim() ||

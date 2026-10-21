@@ -25,6 +25,7 @@ export const MEMORIES_ENDPOINT = `${API_BASE_URL}/api/v1/memories`;
 export const TUTOR_ENDPOINT = `${API_BASE_URL}/api/v1/ai/tutor`;
 export const PLANS_ENDPOINT = `${API_BASE_URL}/api/v1/learning-plans`;
 export const AUTOMATION_RULES_ENDPOINT = `${API_BASE_URL}/api/v1/automation/rules`;
+export const AUTOMATION_RULES_DRAFT_ENDPOINT = `${AUTOMATION_RULES_ENDPOINT}/draft`;
 export const AUTOMATION_RUNS_ENDPOINT = `${API_BASE_URL}/api/v1/automation/runs`;
 export const NOTIFICATIONS_ENDPOINT = `${API_BASE_URL}/api/v1/notifications`;
 export const NOTIFICATIONS_DISPATCH_ENDPOINT = `${NOTIFICATIONS_ENDPOINT}/dispatch`;

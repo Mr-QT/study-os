@@ -4,10 +4,12 @@ import type {
   AutomationRuleDto,
   AutomationRunDto,
   NotificationDto,
+  RuleDraft,
 } from "@study-os/contracts";
 import { useCallback, useEffect, useState } from "react";
 
 import {
+  AUTOMATION_RULES_DRAFT_ENDPOINT,
   AUTOMATION_RULES_ENDPOINT,
   NOTIFICATIONS_DISPATCH_ENDPOINT,
   automationRuleEndpoint,
@@ -25,6 +27,12 @@ const TEXT = {
     ruleName: "规则名称，例如：完成任务后提醒",
     notificationTitle: "通知标题，例如：任务完成",
     addRule: "添加规则",
+    draftLabel: "用一句话生成规则（AI）",
+    draftPlaceholder: "例如：完成任务后提醒我休息 10 分钟",
+    draftCreate: "生成草案",
+    draftSave: "保存规则",
+    draftCancel: "取消",
+    draftFailed: "生成失败，请重试",
     enable: "启用",
     disable: "停用",
     runs: "最近运行",
@@ -42,6 +50,12 @@ const TEXT = {
     ruleName: "Rule name, e.g. remind after task done",
     notificationTitle: "Notification title, e.g. Task done",
     addRule: "Add rule",
+    draftLabel: "Describe a rule in one sentence (AI)",
+    draftPlaceholder: "e.g. remind me to rest after finishing a task",
+    draftCreate: "Draft rule",
+    draftSave: "Save rule",
+    draftCancel: "Cancel",
+    draftFailed: "Draft failed, try again",
     enable: "Enable",
     disable: "Disable",
     runs: "Recent runs",
@@ -62,6 +76,9 @@ export function AutomationPanel({ spaceId, locale }: { spaceId: string; locale: 
   const [unread, setUnread] = useState(0);
   const [ruleName, setRuleName] = useState("");
   const [notificationTitle, setNotificationTitle] = useState("");
+  const [draftText, setDraftText] = useState("");
+  const [draft, setDraft] = useState<RuleDraft | null>(null);
+  const [draftError, setDraftError] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -114,6 +131,47 @@ export function AutomationPanel({ spaceId, locale }: { spaceId: string; locale: 
       setBusy(false);
     }
   }, [busy, load, notificationTitle, ruleName, spaceId]);
+
+  const createDraft = useCallback(async () => {
+    if (!draftText.trim() || busy) return;
+    setBusy(true);
+    setDraftError(false);
+    try {
+      const response = await fetch(AUTOMATION_RULES_DRAFT_ENDPOINT, {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify({ spaceId, text: draftText.trim() }),
+      });
+      if (response.ok) {
+        setDraft((await response.json()) as RuleDraft);
+      } else {
+        setDraftError(true);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, draftText, spaceId]);
+
+  const saveDraft = useCallback(async () => {
+    if (!draft || busy) return;
+    setBusy(true);
+    try {
+      const response = await fetch(AUTOMATION_RULES_ENDPOINT, {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify({ spaceId, ...draft }),
+      });
+      if (response.ok) {
+        setDraft(null);
+        setDraftText("");
+        await load();
+      }
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, draft, load, spaceId]);
 
   const toggleRule = useCallback(
     async (rule: AutomationRuleDto) => {
@@ -196,6 +254,51 @@ export function AutomationPanel({ spaceId, locale }: { spaceId: string; locale: 
           ))}
         </ul>
       )}
+
+      <h4 className="mt-4 text-sm font-semibold text-muted">{text.draftLabel}</h4>
+      <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+        <input
+          value={draftText}
+          onChange={(event) => setDraftText(event.target.value)}
+          placeholder={text.draftPlaceholder}
+          aria-label={text.draftLabel}
+          className="flex-1 rounded-xl border border-line bg-canvas px-3 py-2 text-sm outline-none focus:border-accent"
+        />
+        <button
+          type="button"
+          onClick={() => void createDraft()}
+          disabled={busy || !draftText.trim()}
+          className="rounded-xl border border-line px-4 py-2 text-sm font-medium hover:border-accent disabled:opacity-50"
+        >
+          {text.draftCreate}
+        </button>
+      </div>
+      {draftError ? <p className="mt-1 text-xs text-danger">{text.draftFailed}</p> : null}
+      {draft ? (
+        <div className="mt-2 rounded-xl border border-line bg-canvas p-3 text-sm">
+          <p className="font-medium">{draft.name}</p>
+          <p className="mt-1 text-xs text-muted">
+            {draft.trigger} · {draft.actions.map((action) => action.title).join(", ")}
+          </p>
+          <div className="mt-2 flex gap-2">
+            <button
+              type="button"
+              onClick={() => void saveDraft()}
+              disabled={busy}
+              className="rounded-lg bg-accent-ink px-3 py-1.5 text-xs font-medium text-canvas disabled:opacity-50"
+            >
+              {text.draftSave}
+            </button>
+            <button
+              type="button"
+              onClick={() => setDraft(null)}
+              className="rounded-lg border border-line px-3 py-1.5 text-xs"
+            >
+              {text.draftCancel}
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <h4 className="mt-4 text-sm font-semibold text-muted">{text.runs}</h4>
       {runs.length === 0 ? (

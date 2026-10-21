@@ -11,6 +11,7 @@ import { apiErrorCodes } from "@study-os/contracts";
 
 import { createAiProvider, type AiProvider } from "./ai/provider";
 import { createLocalEmbedder, type Embedder } from "./rag/embedder";
+import { createStorage } from "./storage/adapter";
 import type { ApiConfig } from "./config";
 import { openDatabase } from "./db";
 import { sendError } from "./http/errors";
@@ -104,6 +105,21 @@ export async function buildApp(
     budgetUsd: config.aiBudgetUsd ?? 5,
     costPer1kUsd: config.aiCostPer1kUsd ?? 0.002,
   };
+  const storage = createStorage({
+    driver: config.storageDriver ?? "local",
+    directory: config.storageDir,
+    s3:
+      config.s3Bucket && config.s3Region && config.s3AccessKeyId && config.s3SecretAccessKey
+        ? {
+            bucket: config.s3Bucket,
+            region: config.s3Region,
+            endpoint: config.s3Endpoint,
+            accessKeyId: config.s3AccessKeyId,
+            secretAccessKey: config.s3SecretAccessKey,
+            forcePathStyle: config.s3ForcePathStyle,
+          }
+        : undefined,
+  });
   await app.register(aiRoutes, aiOptions);
   await app.register(tutorRoutes, aiOptions);
   await app.register(agentRoutes, aiOptions);
@@ -117,7 +133,7 @@ export async function buildApp(
   await app.register(calendarRoutes);
   await app.register(noteRoutes);
   await app.register(focusRoutes);
-  await app.register(fileRoutes, { storageDir: config.storageDir });
+  await app.register(fileRoutes, { storage });
   await app.register(learningLogRoutes);
   await app.register(syncRoutes);
   await app.register(statsRoutes);

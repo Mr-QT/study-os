@@ -4,7 +4,7 @@
 - 当前阶段：4 — 智能日程与自动化（4.1/4.2 完成）
 - 当前里程碑：4.1 规则/通知中心；4.2 worker、focus/exam 事件、延迟/去重、AI 规则草案、冲突重试、空间页无障碍
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 78 通过（contracts 10、api 68）；Playwright 13 通过
+- 测试结果：单元/集成 81 通过（contracts 10、api 71）；Playwright 13 通过
 - 数据库：PostgreSQL 16（Docker Compose，持久卷），25 张表，迁移 0000–0010
 - 部署状态：未部署
 - 最近 commit：本次提交后更新
@@ -26,7 +26,7 @@
 | 命令 | 结果 |
 |---|---|
 | `pnpm lint` / `typecheck` / `build` | 通过 |
-| `pnpm test` | 78 passed（contracts 10、api 68） |
+| `pnpm test` | 81 passed（contracts 10、api 71） |
 | `pnpm test:e2e` | 13 passed（新增空间页 axe 无障碍） |
 | `pnpm worker` | 启动成功，冒烟一次发送 4 条到期通知 |
 
@@ -38,16 +38,17 @@
   - 通知延迟（`delayMinutes`）与去重（`dedupeKey`）；
   - `focus.completed`、`exam.submitted` 事件钩子，异常不影响主写入；
   - 独立通知 worker（`pnpm worker`，每 30s 发送到期站内通知，可优雅退出）；
-  - 自然语言规则草案 `POST /api/v1/automation/rules/draft`（AI 生成、服务端校验、审计）；
+  - 自然语言规则草案 `POST /api/v1/automation/rules/draft`（AI 生成、服务端校验、审计），Web 支持生成→预览→保存；
   - 任务 409 冲突自动按最新版本重试一次，失败才提示冲突；
-  - 空间详情页 axe WCAG A/AA 回归。
+  - 空间详情页 axe WCAG A/AA 回归；
+  - **存储适配**：本地磁盘与 S3 兼容对象存储统一 `StorageAdapter`，文件上传/下载/删除走适配器；默认本地，S3 需 `STORAGE_DRIVER=s3` 与凭据；S3 路径尚未做真实 MinIO 集成测试。
 
 ## 未完成项
 
 - 邮件 / PWA 真实投递（需要 SMTP/推送凭据；当前计入 skipped）。
-- 规则草案的审批/一键落库 UI（API 已有）。
+- 规则草案无独立审批角色（生成后可预览再保存）；
 - 高级日历/通知（重复、勿扰、摘要）。
-- 对象存储（当前仅本地磁盘）；冲突合并仍为“重试”而非字段级 diff。
+- 对象存储仅验证本地适配器与配置校验；S3 兼容路径未跑 MinIO 集成测试。
 - 账号/CSRF、CI 远端运行。
 
 ## 下一步

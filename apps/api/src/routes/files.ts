@@ -1,5 +1,4 @@
 import { createHash, randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import type { FastifyPluginAsync } from "fastify";
@@ -20,6 +19,7 @@ import { ensureSpaceAccess } from "../auth/space-access";
 import { toFileAssetDto } from "../dto";
 import { notFound, sendError, validationError } from "../http/errors";
 import { apiErrorCodes } from "@study-os/contracts";
+import type { StorageAdapter } from "../storage/adapter";
 
 const ALLOWED_MIME = new Set([
   "image/png",
@@ -33,7 +33,7 @@ const ALLOWED_MIME = new Set([
 const MAX_BYTES = 10 * 1024 * 1024;
 
 export interface FileRouteOptions {
-  storageDir: string;
+  storage: StorageAdapter;
 }
 
 function safeName(raw: string | undefined): string {
@@ -80,8 +80,7 @@ export const fileRoutes: FastifyPluginAsync<FileRouteOptions> = async (app, opti
     const extension = path.extname(name).slice(0, 10);
     const storageKey = `${randomUUID()}${extension}`;
 
-    await mkdir(options.storageDir, { recursive: true });
-    await writeFile(path.join(options.storageDir, storageKey), buffer);
+    await options.storage.put(storageKey, buffer, part.mimetype);
 
     const [asset] = await database.db
       .insert(fileAssets)
@@ -135,7 +134,7 @@ export const fileRoutes: FastifyPluginAsync<FileRouteOptions> = async (app, opti
     if (access !== "ok") return notFound(reply);
 
     try {
-      const buffer = await readFile(path.join(options.storageDir, asset.storageKey));
+      const buffer = await options.storage.get(asset.storageKey);
       return reply
         .type(asset.mime)
         .header(
@@ -170,6 +169,9 @@ export const fileRoutes: FastifyPluginAsync<FileRouteOptions> = async (app, opti
       .update(fileAssets)
       .set({ deletedAt: new Date() })
       .where(eq(fileAssets.id, asset.id));
+    await options.storage.delete(asset.storageKey).catch(() => {
+      // Metadata deletion still succeeds if the object is already gone.
+    });
     return reply.code(204).send();
   });
 };
