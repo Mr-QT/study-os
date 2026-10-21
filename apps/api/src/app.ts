@@ -33,6 +33,7 @@ import { planRoutes } from "./routes/plans";
 import { noteRoutes } from "./routes/notes";
 import { questionRoutes } from "./routes/questions";
 import { ragRoutes } from "./routes/rag";
+import { ruleDraftRoutes } from "./routes/rule-draft";
 import { spaceRoutes } from "./routes/spaces";
 import { statsRoutes } from "./routes/stats";
 import { syncRoutes } from "./routes/sync";
@@ -108,6 +109,7 @@ export async function buildApp(
   await app.register(agentRoutes, aiOptions);
   await app.register(planRoutes, aiOptions);
   await app.register(extractRoutes, aiOptions);
+  await app.register(ruleDraftRoutes, aiOptions);
   await app.register(authRoutes, { secureCookies: config.secureCookies });
   await app.register(spaceRoutes);
   await app.register(learningRoutes);

@@ -887,6 +887,8 @@ export const automationActionSchema = z.object({
   title: z.string().trim().min(1).max(200),
   body: z.string().max(1000).optional(),
   dueInDays: z.number().int().min(0).max(365).optional(),
+  delayMinutes: z.number().int().min(0).max(10080).optional(),
+  dedupeKey: z.string().trim().max(120).optional(),
 });
 export type AutomationAction = z.infer<typeof automationActionSchema>;
 
@@ -972,3 +974,15 @@ export const dispatchResponseSchema = z.object({
   skipped: z.number().int().nonnegative(),
   failed: z.number().int().nonnegative(),
 });
+
+export const ruleDraftInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  text: z.string().trim().min(1).max(1000),
+});
+export const ruleDraftResponseSchema = z.object({
+  name: z.string().min(1),
+  trigger: automationTriggerSchema,
+  conditions: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])),
+  actions: z.array(automationActionSchema).min(1).max(5),
+});
+export type RuleDraft = z.infer<typeof ruleDraftResponseSchema>;

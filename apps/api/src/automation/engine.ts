@@ -31,6 +31,19 @@ async function performAction(
   action: AutomationAction,
 ): Promise<void> {
   if (action.type === "create_notification") {
+    if (action.dedupeKey) {
+      const existing = await db
+        .select({ id: notifications.id })
+        .from(notifications)
+        .where(
+          and(
+            eq(notifications.userId, event.userId),
+            eq(notifications.dedupeKey, action.dedupeKey),
+          ),
+        )
+        .limit(1);
+      if (existing.length > 0) return;
+    }
     await db.insert(notifications).values({
       userId: event.userId,
       spaceId: event.spaceId,
@@ -38,6 +51,8 @@ async function performAction(
       body: action.body ?? null,
       channel: "in_app",
       status: "pending",
+      scheduledAt: new Date(Date.now() + (action.delayMinutes ?? 0) * 60_000),
+      dedupeKey: action.dedupeKey ?? null,
     });
     return;
   }

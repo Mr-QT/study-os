@@ -16,8 +16,8 @@
 - 1.5 的客户端 outbox 与离线重放已实现（任务状态）；笔记暂无离线编辑入口，冲突只做刷新提示，**没有逐字段合并 UI**。
 - AI 已接 DeepSeek（`deepseek-chat`）并做过一次最小 smoke test；未做长对话、限流、超时重试与真实账单核对。
 - AI 成本为字符估算，真实账单以提供方为准；未做敏感内容脱敏与提示注入深度防护。
-- 阶段 4：通知只有站内渠道真正投递；email/PWA 未接服务，dispatch 会跳过并计数；没有后台调度 worker（需手动或外部定时调用 `/notifications/dispatch`）；规则仅支持 task.completed/focus.completed/exam.submitted 三个触发点。
-- 自动化动作只有 create_notification 与 create_task，无自然语言规则与审批流。
+- 阶段 4：worker 需单独进程（`pnpm worker`），未做进程守护；email/PWA 无投递实现，dispatch 计入 skipped；规则草案只返回草稿，没有审批/落库 UI；任务冲突自动重试一次，不是字段级合并。
+- 自动化动作只有 create_notification 与 create_task，无自然语言审批流。
 - 学习分析只覆盖当前空间；专注分钟按 UTC 记录。
 - 笔记无编辑 UI/搜索/双链；专注无暂停与任务选择 UI。
 - 文件仅本地磁盘、单实例，无病毒扫描、配额、版本。

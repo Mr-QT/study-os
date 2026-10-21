@@ -29,6 +29,7 @@ import {
 
 import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess } from "../auth/space-access";
+import { runAutomations } from "../automation/engine";
 import { notFound, validationError } from "../http/errors";
 
 function toExamDto(row: ExamRow): ExamDto {
@@ -238,6 +239,13 @@ export const assessmentRoutes: FastifyPluginAsync = async (app) => {
     if (!attempt) return notFound(reply);
     if (attempt.submittedAt) return validationError(reply, { message: "该考试已提交" });
 
+    const [exam] = await database.db
+      .select({ spaceId: exams.spaceId })
+      .from(exams)
+      .where(eq(exams.id, attempt.examId))
+      .limit(1);
+    if (!exam) return notFound(reply);
+
     const rows = await database.db
       .select({ question: questions, link: examQuestions })
       .from(examQuestions)
@@ -293,6 +301,16 @@ export const assessmentRoutes: FastifyPluginAsync = async (app) => {
     if (!updated) return reply;
 
     const percentage = attempt.maxScore === 0 ? 0 : Math.round((score / attempt.maxScore) * 100);
+    try {
+      await runAutomations(database.db, {
+        trigger: "exam.submitted",
+        spaceId: exam.spaceId,
+        userId: user.id,
+        context: { examId: attempt.examId, percentage },
+      });
+    } catch {
+      // Automation must never fail the user's write.
+    }
     return submitExamAttemptResponseSchema.parse({
       attempt: toAttemptDto(updated),
       percentage,

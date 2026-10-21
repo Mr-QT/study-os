@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync } from "fastify";
 
-import { and, desc, eq, lte } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 import {
   automationActionSchema,
@@ -28,6 +28,7 @@ import {
 } from "@study-os/db";
 
 import { matchRule } from "../automation/engine";
+import { dispatchDueNotifications } from "../notifications/dispatch";
 import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess } from "../auth/space-access";
 import { notFound, validationError } from "../http/errors";
@@ -274,30 +275,7 @@ export const automationRoutes: FastifyPluginAsync = async (app) => {
     const database = request.server.database;
     if (!database) return reply;
 
-    const due = await database.db
-      .select()
-      .from(notifications)
-      .where(
-        and(
-          eq(notifications.userId, user.id),
-          eq(notifications.status, "pending"),
-          lte(notifications.scheduledAt, new Date()),
-        ),
-      );
-
-    let sent = 0;
-    let skipped = 0;
-    for (const notification of due) {
-      if (notification.channel !== "in_app") {
-        skipped += 1;
-        continue;
-      }
-      await database.db
-        .update(notifications)
-        .set({ status: "sent", sentAt: new Date() })
-        .where(eq(notifications.id, notification.id));
-      sent += 1;
-    }
-    return dispatchResponseSchema.parse({ sent, skipped, failed: 0 });
+    const result = await dispatchDueNotifications(database.db, user.id);
+    return dispatchResponseSchema.parse(result);
   });
 };

@@ -24,6 +24,36 @@ for (const locale of ["zh-CN", "en"] as const) {
   });
 }
 
+test("space detail has no WCAG A/AA violations", async ({ page }) => {
+  await page.goto("/zh-CN");
+  const unavailable = page.getByText("数据库未配置");
+  if (await unavailable.isVisible().catch(() => false)) {
+    test.skip(true, "PostgreSQL is not configured in this environment");
+  }
+
+  const name = `无障碍空间-${Date.now()}`;
+  await page.getByLabel("空间名称，例如：高等数学").fill(name);
+  await page.getByRole("button", { name: "创建空间" }).click();
+  await page.getByRole("link", { name: new RegExp(name) }).click();
+  await expect(page.getByRole("heading", { name })).toBeVisible();
+
+  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+  expect(
+    results.violations,
+    JSON.stringify(
+      results.violations.map(({ id, impact, nodes }) => ({
+        id,
+        impact,
+        targets: nodes.map((node) => node.target),
+      })),
+      null,
+      2,
+    ),
+  ).toEqual([]);
+
+  await page.screenshot({ path: "test-results/space-a11y.png", fullPage: true });
+});
+
 test("home renders without horizontal overflow on phone and tablet", async ({ page }) => {
   for (const viewport of [
     { name: "phone", width: 390, height: 844 },

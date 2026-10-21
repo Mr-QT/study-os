@@ -11,6 +11,7 @@
     "dev": "pnpm run --parallel --filter \"./apps/*\" dev",
     "dev:api": "pnpm --filter @study-os/api dev",
     "dev:web": "pnpm --filter @study-os/web dev",
+    "worker": "pnpm --filter @study-os/api worker",
     "build": "pnpm -r build",
     "lint": "eslint .",
     "typecheck": "pnpm -r typecheck",

@@ -302,7 +302,6 @@ export function SpaceWorkspace({
         });
 
         if (response.status === 409) {
-          setTaskConflict(true);
           const refreshed = await fetch(taskListEndpoint(spaceId), {
             credentials: "include",
             headers: { accept: "application/json" },
@@ -310,7 +309,25 @@ export function SpaceWorkspace({
           if (refreshed.ok) {
             const body = (await refreshed.json()) as { tasks: TaskDto[] };
             setTasks(body.tasks);
+            const current = body.tasks.find((item) => item.id === task.id);
+            if (current && current.status !== status) {
+              const retry = await fetch(taskEndpoint(task.id), {
+                method: "PATCH",
+                credentials: "include",
+                headers: jsonHeaders,
+                body: JSON.stringify({ status, version: current.version }),
+              });
+              if (retry.ok) {
+                const { task: updated } = (await retry.json()) as { task: TaskDto };
+                setTasks((previous) =>
+                  previous.map((item) => (item.id === updated.id ? updated : item)),
+                );
+                setTaskConflict(false);
+                return;
+              }
+            }
           }
+          setTaskConflict(true);
           return;
         }
 

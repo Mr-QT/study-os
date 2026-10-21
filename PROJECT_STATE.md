@@ -1,13 +1,13 @@
 # PROJECT_STATE — 真实项目状态
 
-- 日期：2026-10-20
-- 当前阶段：4 — 智能日程与自动化（进行中）
-- 当前里程碑：4.1 自动化规则引擎、运行记录与通知中心 — 完成
+- 日期：2026-10-21
+- 当前阶段：4 — 智能日程与自动化（4.1/4.2 完成）
+- 当前里程碑：4.1 规则/通知中心；4.2 worker、focus/exam 事件、延迟/去重、AI 规则草案、冲突重试、空间页无障碍
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 74 通过（contracts 10、api 64）；Playwright 12 通过
+- 测试结果：单元/集成 78 通过（contracts 10、api 68）；Playwright 13 通过
 - 数据库：PostgreSQL 16（Docker Compose，持久卷），25 张表，迁移 0000–0010
 - 部署状态：未部署
-- 最近 commit：`28489ee`
+- 最近 commit：本次提交后更新
 
 ## 环境（实测）
 
@@ -26,31 +26,34 @@
 | 命令 | 结果 |
 |---|---|
 | `pnpm lint` / `typecheck` / `build` | 通过 |
-| `pnpm test` | 74 passed（contracts 10、api 64） |
-| `pnpm test:e2e` | 12 passed |
+| `pnpm test` | 78 passed（contracts 10、api 68） |
+| `pnpm test:e2e` | 13 passed（新增空间页 axe 无障碍） |
+| `pnpm worker` | 启动成功，冒烟一次发送 4 条到期通知 |
 
 ## 已实现
 
 - 阶段 1–3：学习平台、题库/考试/复习、RAG/PDF、AI 记忆、分析/风险、导师、多 Agent、学习计划、记忆提取。
-- 4.1：
-  - **自动化规则**：trigger（task.completed / focus.completed / exam.submitted）+ conditions + actions（create_notification / create_task）；规则 CRUD、启停、dry-run；
-  - **运行记录**：`automation_runs`，成功/失败留痕；
-  - **通知中心**：`notifications`，站内通知列表、未读数、标为已读、`dispatch` 发送到期站内通知（email/pwa 暂未接投递）；
-  - **事件钩子**：任务首次变为 done 时触发 `task.completed` 自动化，失败不影响用户写入；
-  - Web：「自动化与通知」面板（规则增删启停、最近运行、通知列表/发送/已读）。
+- 4.1：自动化规则（trigger/conditions/actions）、运行记录、站内通知中心、规则与通知 UI。
+- 4.2：
+  - 通知延迟（`delayMinutes`）与去重（`dedupeKey`）；
+  - `focus.completed`、`exam.submitted` 事件钩子，异常不影响主写入；
+  - 独立通知 worker（`pnpm worker`，每 30s 发送到期站内通知，可优雅退出）；
+  - 自然语言规则草案 `POST /api/v1/automation/rules/draft`（AI 生成、服务端校验、审计）；
+  - 任务 409 冲突自动按最新版本重试一次，失败才提示冲突；
+  - 空间详情页 axe WCAG A/AA 回归。
 
-## 未完成项（阶段 4 剩余）
+## 未完成项
 
-- 邮件 / PWA 推送的真实投递（需 SMTP/推送服务与凭据）。
-- 定时调度 worker（当前 dispatch 需手动/外部触发）。
-- 自然语言生成规则（AI 草案）与审批流。
-- 高级日历/通知调度（重复事件、勿扰、摘要）。
-- 跨阶段：冲突合并 UI、账号/CSRF、对象存储、CI 远端运行。
+- 邮件 / PWA 真实投递（需要 SMTP/推送凭据；当前计入 skipped）。
+- 规则草案的审批/一键落库 UI（API 已有）。
+- 高级日历/通知（重复、勿扰、摘要）。
+- 对象存储（当前仅本地磁盘）；冲突合并仍为“重试”而非字段级 diff。
+- 账号/CSRF、CI 远端运行。
 
 ## 下一步
 
-1. 验收 4.1。
-2. 继续 4.2：调度 worker + 多渠道投递（需用户提供 SMTP/推送凭据）。
-3. 或先补跨阶段项。
+1. 用户验收 4.2。
+2. 对象存储适配接口（本地 + 可配置 S3 兼容端点）。
+3. 有凭据后接 SMTP/PWA 投递。
 
 > 每次修改都需附实际证据；禁止未经运行验证标记 DONE。
