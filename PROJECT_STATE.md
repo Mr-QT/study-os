@@ -7,7 +7,7 @@
 - 测试结果：单元/集成 97 通过（contracts 10、api 87）；Playwright 13 通过
 - 数据库：PostgreSQL 16（Docker Compose，持久卷），29 张表，迁移 0000–0013
 - 部署状态：未部署
-- 最近 commit：`2d668ad`
+- 最近 commit：`90ff9a9`
 
 ## 环境（实测）
 
