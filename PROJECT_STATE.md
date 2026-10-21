@@ -7,7 +7,7 @@
 - 测试结果：单元/集成 97 通过（contracts 10、api 87）；Playwright 14 通过
 - 数据库：PostgreSQL 16（Docker Compose，持久卷），29 张表，迁移 0000–0013
 - 部署状态：未部署
-- 最近 commit：`90ff9a9`
+- 最近 commit：`1c4705f`
 
 ## 环境（实测）
 
@@ -27,7 +27,7 @@
 |---|---|
 | `pnpm lint` / `typecheck` / `build` | 通过 |
 | `pnpm test` | 97 passed（contracts 10、api 87） |
-| `pnpm test:e2e` | 13 passed（新增空间页 axe 无障碍） |
+| `pnpm test:e2e` | 14 passed（含空间页 axe、目标/习惯） |
 | `pnpm worker` | 启动成功，冒烟一次发送 4 条到期通知 |
 
 ## 已实现
