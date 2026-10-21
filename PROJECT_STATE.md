@@ -4,7 +4,7 @@
 - 当前阶段：5 — 多模态、迁移、成长与作品集（5.1 完成）
 - 当前里程碑：5.1 学习目标、习惯打卡、成就与成长档案导出
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 97 通过（contracts 10、api 87）；Playwright 13 通过
+- 测试结果：单元/集成 97 通过（contracts 10、api 87）；Playwright 14 通过
 - 数据库：PostgreSQL 16（Docker Compose，持久卷），29 张表，迁移 0000–0013
 - 部署状态：未部署
 - 最近 commit：`90ff9a9`

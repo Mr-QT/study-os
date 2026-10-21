@@ -140,4 +140,32 @@ test.describe("Study OS notes, focus and files", () => {
 
     await page.screenshot({ path: "test-results/pdf-annotation.png", fullPage: true });
   });
+
+  test("creates a goal and checks in a habit", async ({ page }) => {
+    await page.goto("/zh-CN");
+    const unavailable = page.getByText("数据库未配置");
+    if (await unavailable.isVisible().catch(() => false)) {
+      test.skip(true, "PostgreSQL is not configured in this environment");
+    }
+
+    const suffix = Date.now();
+    const spaceName = `成长空间-${suffix}`;
+    await page.getByLabel("空间名称，例如：高等数学").fill(spaceName);
+    await page.getByRole("button", { name: "创建空间" }).click();
+    await page.getByRole("link", { name: new RegExp(spaceName) }).click();
+    await expect(page).toHaveURL(/\/spaces\/[0-9a-f-]+$/);
+
+    await page.getByLabel("目标标题，例如：本周专注 300 分钟").fill(`E2E 目标-${suffix}`);
+    await page.getByRole("button", { name: "添加目标" }).click();
+    await expect(page.getByText(`E2E 目标-${suffix}`)).toBeVisible();
+
+    await page.getByLabel("习惯，例如：每天复习 10 分钟").fill(`E2E 习惯-${suffix}`);
+    await page.getByRole("button", { name: "添加习惯" }).click();
+    await expect(page.getByText(`E2E 习惯-${suffix}`)).toBeVisible();
+
+    await page.getByRole("button", { name: "打卡" }).first().click();
+    await expect(page.getByText(/今日 1/)).toBeVisible();
+
+    await page.screenshot({ path: "test-results/growth.png", fullPage: true });
+  });
 });

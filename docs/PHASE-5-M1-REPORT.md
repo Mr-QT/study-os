@@ -24,7 +24,7 @@
 
 - `test/growth.integration.test.ts`（5 个）：目标进度、习惯同日打卡与连续天数、档案/成就/导出、跨用户隔离、习惯列表
 - `pnpm test`：97 passed（contracts 10、api 87）
-- `pnpm test:e2e`：13 passed
+- `pnpm test:e2e`：14 passed（新增目标创建/习惯打卡）
 - `pnpm lint` / `typecheck` / `build`：通过
 
 ## 未完成
