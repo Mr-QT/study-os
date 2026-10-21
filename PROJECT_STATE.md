@@ -1,11 +1,11 @@
 # PROJECT_STATE — 真实项目状态
 
 - 日期：2026-10-21
-- 当前阶段：4 — 智能日程与自动化（4.1/4.2/4.3 完成）
-- 当前里程碑：4.3 重复事件、事件提醒、免打扰时段、每日摘要与偏好设置
+- 当前阶段：5 — 多模态、迁移、成长与作品集（5.1 完成）
+- 当前里程碑：5.1 学习目标、习惯打卡、成就与成长档案导出
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 92 通过（contracts 10、api 82）；Playwright 13 通过
-- 数据库：PostgreSQL 16（Docker Compose，持久卷），26 张表，迁移 0000–0012
+- 测试结果：单元/集成 97 通过（contracts 10、api 87）；Playwright 13 通过
+- 数据库：PostgreSQL 16（Docker Compose，持久卷），29 张表，迁移 0000–0013
 - 部署状态：未部署
 - 最近 commit：`2d668ad`
 
@@ -26,7 +26,7 @@
 | 命令 | 结果 |
 |---|---|
 | `pnpm lint` / `typecheck` / `build` | 通过 |
-| `pnpm test` | 92 passed（contracts 10、api 82） |
+| `pnpm test` | 97 passed（contracts 10、api 87） |
 | `pnpm test:e2e` | 13 passed（新增空间页 axe 无障碍） |
 | `pnpm worker` | 启动成功，冒烟一次发送 4 条到期通知 |
 
@@ -43,6 +43,7 @@
   - 空间详情页 axe WCAG A/AA 回归；
   - **存储适配**：本地磁盘与 S3 兼容对象存储统一 `StorageAdapter`，文件上传/下载/删除走适配器；默认本地，S3 需 `STORAGE_DRIVER=s3` 与凭据；S3 路径尚未做真实 MinIO 集成测试。
   - **4.3 高级日历与通知**：重复事件（daily/weekly + recurrenceUntil）、事件提前提醒（0–10080 分钟、自动去重、更新/删除时重排）、免打扰时段顺延、每日摘要（可配置小时、按天去重）、偏好设置 API 与 UI；worker 每小时检查摘要候选。
+  - **5.1 成长**：学习目标（专注分钟/完成任务/作答题数/完成考试，按区间自动计算进度）、习惯与每日打卡（同日累加、连续天数）、成就徽章、成长档案汇总与 Markdown 导出（含来源说明，不含原始笔记/题目内容）；Web「目标、习惯与成长档案」面板。
 
 ## 未完成项
 

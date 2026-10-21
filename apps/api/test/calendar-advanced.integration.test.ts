@@ -50,6 +50,12 @@ describe.skipIf(!databaseUrl)("stage 4.3: recurring events, reminders and digest
     const body = authSessionResponseSchema.parse(guest.json());
     cookie = cookieHeader(guest);
     spaceId = body.spaces[0]?.id ?? "";
+    await app.inject({
+      method: "PATCH",
+      url: "/api/v1/notifications/preferences",
+      headers: { cookie },
+      payload: { quietStartHour: 0, quietEndHour: 0 },
+    });
   });
 
   afterAll(async () => {

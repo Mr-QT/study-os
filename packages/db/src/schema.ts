@@ -9,6 +9,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -613,6 +614,78 @@ export const notificationPreferences = pgTable("notification_preferences", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const goalMetricEnum = pgEnum("goal_metric", [
+  "focus_minutes",
+  "tasks_done",
+  "questions_answered",
+  "exams_completed",
+]);
+export const goalStatusEnum = pgEnum("goal_status", ["active", "completed", "archived"]);
+export const habitCadenceEnum = pgEnum("habit_cadence", ["daily", "weekly"]);
+
+export const learningGoals = pgTable(
+  "learning_goals",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    metric: goalMetricEnum("metric").notNull(),
+    targetValue: integer("target_value").notNull(),
+    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    status: goalStatusEnum("status").notNull().default("active"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("goals_space_idx").on(table.spaceId),
+    index("goals_user_idx").on(table.userId),
+  ],
+);
+
+export const habits = pgTable(
+  "habits",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    cadence: habitCadenceEnum("cadence").notNull().default("daily"),
+    targetPerPeriod: integer("target_per_period").notNull().default(1),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("habits_space_idx").on(table.spaceId)],
+);
+
+export const habitCheckins = pgTable(
+  "habit_checkins",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    habitId: uuid("habit_id")
+      .notNull()
+      .references(() => habits.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    checkinDate: date("checkin_date").notNull(),
+    count: integer("count").notNull().default(1),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex("habit_checkin_unique").on(table.habitId, table.checkinDate)],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -641,3 +714,6 @@ export type AutomationRuleRow = typeof automationRules.$inferSelect;
 export type AutomationRunRow = typeof automationRuns.$inferSelect;
 export type NotificationRow = typeof notifications.$inferSelect;
 export type NotificationPreferenceRow = typeof notificationPreferences.$inferSelect;
+export type LearningGoalRow = typeof learningGoals.$inferSelect;
+export type HabitRow = typeof habits.$inferSelect;
+export type HabitCheckinRow = typeof habitCheckins.$inferSelect;

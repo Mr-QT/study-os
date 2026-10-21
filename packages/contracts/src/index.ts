@@ -1042,6 +1042,132 @@ export const digestResponseSchema = z.object({
   notification: notificationSchema.nullable(),
 });
 
+/* ------------------------------------------------------------------ */
+/* Stage 5: growth goals, habits, achievements and portfolio export    */
+/* ------------------------------------------------------------------ */
+
+export const goalMetricSchema = z.enum([
+  "focus_minutes",
+  "tasks_done",
+  "questions_answered",
+  "exams_completed",
+]);
+export type GoalMetric = z.infer<typeof goalMetricSchema>;
+
+export const goalStatusSchema = z.enum(["active", "completed", "archived"]);
+
+export const learningGoalSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().nullable(),
+  metric: goalMetricSchema,
+  targetValue: z.number().int().positive(),
+  currentValue: z.number().nonnegative(),
+  progressPercent: z.number().min(0).max(100),
+  startsAt: z.string().min(1),
+  endsAt: z.string().min(1),
+  status: goalStatusSchema,
+  createdAt: z.string().min(1),
+  updatedAt: z.string().min(1),
+});
+export type LearningGoalDto = z.infer<typeof learningGoalSchema>;
+
+export const createGoalInputSchema = z
+  .object({
+    spaceId: z.string().uuid(),
+    title: z.string().trim().min(1).max(200),
+    description: z.string().max(2000).optional(),
+    metric: goalMetricSchema,
+    targetValue: z.number().int().min(1).max(1_000_000),
+    startsAt: isoDateTimeSchema,
+    endsAt: isoDateTimeSchema,
+  })
+  .refine((value) => Date.parse(value.endsAt) > Date.parse(value.startsAt), {
+    message: "结束时间必须晚于开始时间",
+  });
+export type CreateGoalInput = z.infer<typeof createGoalInputSchema>;
+
+export const updateGoalInputSchema = z
+  .object({
+    title: z.string().trim().min(1).max(200).optional(),
+    description: z.string().max(2000).nullable().optional(),
+    targetValue: z.number().int().min(1).max(1_000_000).optional(),
+    startsAt: isoDateTimeSchema.optional(),
+    endsAt: isoDateTimeSchema.optional(),
+    status: goalStatusSchema.optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, { message: "至少需要一个字段" });
+
+export const goalListResponseSchema = z.object({ goals: z.array(learningGoalSchema) });
+export const goalResponseSchema = z.object({ goal: learningGoalSchema });
+
+export const habitCadenceSchema = z.enum(["daily", "weekly"]);
+
+export const habitSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  cadence: habitCadenceSchema,
+  targetPerPeriod: z.number().int().positive(),
+  active: z.boolean(),
+  todayCount: z.number().int().nonnegative(),
+  streak: z.number().int().nonnegative(),
+  createdAt: z.string().min(1),
+});
+export type HabitDto = z.infer<typeof habitSchema>;
+
+export const createHabitInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  title: z.string().trim().min(1).max(200),
+  cadence: habitCadenceSchema.optional(),
+  targetPerPeriod: z.number().int().min(1).max(50).optional(),
+});
+export type CreateHabitInput = z.infer<typeof createHabitInputSchema>;
+
+export const updateHabitInputSchema = z
+  .object({
+    title: z.string().trim().min(1).max(200).optional(),
+    cadence: habitCadenceSchema.optional(),
+    targetPerPeriod: z.number().int().min(1).max(50).optional(),
+    active: z.boolean().optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, { message: "至少需要一个字段" });
+
+export const habitListResponseSchema = z.object({ habits: z.array(habitSchema) });
+export const habitResponseSchema = z.object({ habit: habitSchema });
+
+export const habitCheckinInputSchema = z.object({
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+});
+
+export const achievementSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  earned: z.boolean(),
+  detail: z.string(),
+});
+
+export const profileSummarySchema = z.object({
+  totals: z.object({
+    focusMinutes: z.number().int().nonnegative(),
+    tasksDone: z.number().int().nonnegative(),
+    questionsAnswered: z.number().int().nonnegative(),
+    examsCompleted: z.number().int().nonnegative(),
+  }),
+  goals: z.array(learningGoalSchema),
+  habits: z.array(habitSchema),
+  achievements: z.array(achievementSchema),
+  generatedAt: z.string().min(1),
+});
+export type ProfileSummary = z.infer<typeof profileSummarySchema>;
+
+export const profileExportResponseSchema = z.object({
+  markdown: z.string().min(1),
+  generatedAt: z.string().min(1),
+});
+
 export const ruleDraftInputSchema = z.object({
   spaceId: z.string().uuid(),
   text: z.string().trim().min(1).max(1000),

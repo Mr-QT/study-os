@@ -31,6 +31,10 @@ export const NOTIFICATIONS_ENDPOINT = `${API_BASE_URL}/api/v1/notifications`;
 export const NOTIFICATIONS_DISPATCH_ENDPOINT = `${NOTIFICATIONS_ENDPOINT}/dispatch`;
 export const NOTIFICATION_PREFERENCES_ENDPOINT = `${NOTIFICATIONS_ENDPOINT}/preferences`;
 export const NOTIFICATION_DIGEST_ENDPOINT = `${NOTIFICATIONS_ENDPOINT}/digest`;
+export const GOALS_ENDPOINT = `${API_BASE_URL}/api/v1/goals`;
+export const HABITS_ENDPOINT = `${API_BASE_URL}/api/v1/habits`;
+export const PROFILE_SUMMARY_ENDPOINT = `${API_BASE_URL}/api/v1/profile/summary`;
+export const PROFILE_EXPORT_ENDPOINT = `${API_BASE_URL}/api/v1/profile/export`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -166,4 +170,24 @@ export function notificationReadEndpoint(notificationId: string): string {
 
 export function notificationsEndpoint(spaceId: string): string {
   return `${NOTIFICATIONS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function goalsEndpoint(spaceId: string): string {
+  return `${GOALS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function habitsEndpoint(spaceId: string): string {
+  return `${HABITS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function habitCheckinEndpoint(habitId: string): string {
+  return `${HABITS_ENDPOINT}/${habitId}/checkins`;
+}
+
+export function profileSummaryEndpoint(spaceId: string): string {
+  return `${PROFILE_SUMMARY_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function profileExportEndpoint(spaceId: string): string {
+  return `${PROFILE_EXPORT_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}`;
 }

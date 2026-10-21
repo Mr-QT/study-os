@@ -25,6 +25,7 @@ import { calendarRoutes } from "./routes/calendar";
 import { learningRoutes } from "./routes/courses";
 import { fileRoutes } from "./routes/files";
 import { focusRoutes } from "./routes/focus";
+import { growthRoutes } from "./routes/growth";
 import { healthRoutes } from "./routes/health";
 import { knowledgeRoutes } from "./routes/knowledge";
 import { learningLogRoutes } from "./routes/learning-log";
@@ -132,6 +133,7 @@ export async function buildApp(
   await app.register(learningRoutes);
   await app.register(taskRoutes);
   await app.register(calendarRoutes);
+  await app.register(growthRoutes);
   await app.register(notificationPreferenceRoutes);
   await app.register(noteRoutes);
   await app.register(focusRoutes);
