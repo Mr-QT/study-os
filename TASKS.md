@@ -15,8 +15,8 @@
 | P5-01 | 对象存储适配 | DONE/PARTIAL | 本地+S3 适配器、配置校验；S3 未做 MinIO 集成 |
 | P5-02 | 目标、习惯、成就与成长档案 | DONE | 97 测试 + 14 E2E；迁移 0013；成长面板 |
 | P5-03 | CSV 迁移中心 | DONE | 106 测试 + 15 E2E；迁移 0014；预览/回滚/原件 |
-| P5-04 | 多模态（转写/OCR） | TODO | 需模型选型 |
-| P5-05 | 作品集页面 | TODO | 当前仅 Markdown 导出 |
+| P5-04 | 多模态（OCR / 音频转写，本地） | DONE | `/media/ocr`、`/media/transcribe`、媒体面板；真实 OCR/Whisper 冒烟 |
+| P5-05 | 作品集页面 | DONE | `/spaces/:id/portfolio` + 导出；16 E2E |
 | P5 | 多模态/迁移/成长/作品集 | TODO | 后续阶段 |
 
 状态限定：TODO / IN_PROGRESS / BLOCKED / PARTIAL / DONE（DONE 需证据）。

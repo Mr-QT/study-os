@@ -145,10 +145,14 @@ const jsonHeaders = { "content-type": "application/json", accept: "application/j
 export function SpaceWorkspace({
   spaceId,
   backHref,
+  portfolioHref,
+  portfolioLabel,
   labels,
 }: {
   spaceId: string;
   backHref: string;
+  portfolioHref: string;
+  portfolioLabel: string;
   labels: SpaceLabels;
 }) {
   const [state, setState] = useState<LoadState>("loading");
@@ -425,9 +429,17 @@ export function SpaceWorkspace({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href={backHref} className="text-sm text-muted hover:text-accent-ink">
-          ← {labels.back}
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Link href={backHref} className="text-sm text-muted hover:text-accent-ink">
+            ← {labels.back}
+          </Link>
+          <Link
+            href={portfolioHref}
+            className="rounded-lg border border-line px-3 py-1.5 text-xs font-medium hover:border-accent"
+          >
+            {portfolioLabel}
+          </Link>
+        </div>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight">{space?.name}</h2>
       </div>
 

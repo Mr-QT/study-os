@@ -4,6 +4,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { AutomationPanel } from "@/components/automation-panel";
 import { GrowthPanel } from "@/components/growth-panel";
 import { InsightsPanel } from "@/components/insights-panel";
+import { MediaPanel } from "@/components/media-panel";
 import { MigrationPanel } from "@/components/migration-panel";
 import { PlansPanel } from "@/components/plans-panel";
 import { SpaceWorkspace } from "@/components/space-workspace";
@@ -37,6 +38,8 @@ export default async function SpacePage({
         <SpaceWorkspace
           spaceId={id}
           backHref={`/${lang}`}
+          portfolioHref={`/${lang}/spaces/${id}/portfolio`}
+          portfolioLabel={dict.portfolio}
           labels={{
             back: dict.backToSpaces,
             notFound: dict.spaceNotFound,
@@ -154,6 +157,7 @@ export default async function SpacePage({
           <PlansPanel spaceId={id} locale={lang} />
           <GrowthPanel spaceId={id} locale={lang} />
           <MigrationPanel spaceId={id} locale={lang} />
+          <MediaPanel spaceId={id} locale={lang} />
           <AutomationPanel spaceId={id} locale={lang} />
           <InsightsPanel spaceId={id} locale={lang} />
         </div>

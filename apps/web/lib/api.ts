@@ -36,6 +36,7 @@ export const HABITS_ENDPOINT = `${API_BASE_URL}/api/v1/habits`;
 export const PROFILE_SUMMARY_ENDPOINT = `${API_BASE_URL}/api/v1/profile/summary`;
 export const PROFILE_EXPORT_ENDPOINT = `${API_BASE_URL}/api/v1/profile/export`;
 export const IMPORTS_ENDPOINT = `${API_BASE_URL}/api/v1/imports`;
+export const MEDIA_ENDPOINT = `${API_BASE_URL}/api/v1/media`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -207,4 +208,8 @@ export function importRollbackEndpoint(batchId: string): string {
 
 export function importOriginalEndpoint(batchId: string): string {
   return `${IMPORTS_ENDPOINT}/${batchId}/original`;
+}
+
+export function mediaEndpoint(kind: "ocr" | "transcribe", spaceId: string): string {
+  return `${MEDIA_ENDPOINT}/${kind}?spaceId=${encodeURIComponent(spaceId)}`;
 }

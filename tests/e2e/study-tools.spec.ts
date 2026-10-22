@@ -194,4 +194,30 @@ test.describe("Study OS notes, focus and files", () => {
 
     await page.screenshot({ path: "test-results/migration.png", fullPage: true });
   });
+
+  test("opens the growth portfolio", async ({ page }) => {
+    await page.goto("/zh-CN");
+    const unavailable = page.getByText("数据库未配置");
+    if (await unavailable.isVisible().catch(() => false)) {
+      test.skip(true, "PostgreSQL is not configured in this environment");
+    }
+
+    const suffix = Date.now();
+    const spaceName = `作品集空间-${suffix}`;
+    await page.getByLabel("空间名称，例如：高等数学").fill(spaceName);
+    await page.getByRole("button", { name: "创建空间" }).click();
+    await page.getByRole("link", { name: new RegExp(spaceName) }).click();
+
+    const portfolioLink = page.getByRole("link", { name: "作品集" });
+    await expect(portfolioLink).toHaveAttribute("href", /\/portfolio$/);
+    const href = await portfolioLink.getAttribute("href");
+    await page.goto(href ?? "/zh-CN");
+
+    await expect(page).toHaveURL(/\/portfolio$/);
+    await expect(page.getByRole("heading", { name: "成长作品集" })).toBeVisible();
+    await expect(page.getByText("学习总计")).toBeVisible();
+    await expect(page.getByRole("button", { name: "导出 Markdown" })).toBeVisible();
+
+    await page.screenshot({ path: "test-results/portfolio.png", fullPage: true });
+  });
 });

@@ -1238,3 +1238,14 @@ export const ruleDraftResponseSchema = z.object({
   actions: z.array(automationActionSchema).min(1).max(5),
 });
 export type RuleDraft = z.infer<typeof ruleDraftResponseSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Stage 5.3: local multimodal (OCR / speech)                          */
+/* ------------------------------------------------------------------ */
+
+export const mediaTextResponseSchema = z.object({
+  kind: z.enum(["ocr", "transcribe"]),
+  text: z.string(),
+  model: z.string().min(1),
+});
+export type MediaTextResponse = z.infer<typeof mediaTextResponseSchema>;

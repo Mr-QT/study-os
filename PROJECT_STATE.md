@@ -1,10 +1,10 @@
 # PROJECT_STATE — 真实项目状态
 
-- 日期：2026-10-21
-- 当前阶段：5 — 多模态、迁移、成长与作品集（5.1/5.2 完成）
-- 当前里程碑：5.2 CSV 迁移中心（预览、确认、回滚、原件保护）
+- 日期：2026-10-22
+- 当前阶段：5 — 多模态、迁移、成长与作品集（5.1/5.2/5.3 完成）
+- 当前里程碑：5.3 作品集页面 + 本地 OCR / 音频转写
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 106 通过（contracts 10、api 96）；Playwright 15 通过
+- 测试结果：单元/集成 113 通过（contracts 10、api 103）；Playwright 16 通过
 - 数据库：PostgreSQL 16（Docker Compose，持久卷），31 张表，迁移 0000–0014
 - 部署状态：未部署
 - 最近功能 commit：`057665a`
@@ -26,8 +26,8 @@
 | 命令 | 结果 |
 |---|---|
 | `pnpm lint` / `typecheck` / `build` | 通过 |
-| `pnpm test` | 106 passed（contracts 10、api 96） |
-| `pnpm test:e2e` | 15 passed（含空间页 axe、目标/习惯、CSV 导入） |
+| `pnpm test` | 113 passed（contracts 10、api 103） |
+| `pnpm test:e2e` | 16 passed（含作品集、迁移、目标/习惯） |
 | `pnpm worker` | 启动成功，冒烟一次发送 4 条到期通知 |
 
 ## 已实现
@@ -45,6 +45,7 @@
   - **4.3 高级日历与通知**：重复事件（daily/weekly + recurrenceUntil）、事件提前提醒（0–10080 分钟、自动去重、更新/删除时重排）、免打扰时段顺延、每日摘要（可配置小时、按天去重）、偏好设置 API 与 UI；worker 每小时检查摘要候选。
   - **5.1 成长**：学习目标（专注分钟/完成任务/作答题数/完成考试，按区间自动计算进度）、习惯与每日打卡（同日累加、连续天数）、成就徽章、成长档案汇总与 Markdown 导出（含来源说明，不含原始笔记/题目内容）；Web「目标、习惯与成长档案」面板。
   - **5.2 迁移中心**：CSV 导入任务/题库；预览逐行校验、确认导入、按批次回滚（软删除）、原件保存与 SHA-256、下载原件；`import_batches`/`import_items` 记录来源；Web 预览表与批次列表。
+  - **5.3 作品集与多模态**：独立 `/spaces/:id/portfolio` 页面（总计、目标、习惯、成就、导出）；本地 OCR（tesseract.js，自动下载 eng 语言包）与音频转写（Transformers.js Whisper-tiny，hf-mirror），WAV 16-bit 输入；识别结果可一键保存为笔记。
 
 ## 未完成项
 

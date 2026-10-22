@@ -41,12 +41,21 @@ import { ruleDraftRoutes } from "./routes/rule-draft";
 import { spaceRoutes } from "./routes/spaces";
 import { statsRoutes } from "./routes/stats";
 import { syncRoutes } from "./routes/sync";
+import { ocrImage } from "./media/ocr";
+import { transcribeAudio } from "./media/transcribe";
+import { mediaRoutes } from "./routes/media";
 import { taskRoutes } from "./routes/tasks";
 import { tutorRoutes } from "./routes/tutor";
 
 export interface AppDependencies {
   aiProvider?: AiProvider | null;
   embedder?: Embedder;
+  media?: {
+    ocr: (buffer: Buffer) => Promise<string>;
+    transcribe: (buffer: Buffer) => Promise<string>;
+    ocrModel: string;
+    asrModel: string;
+  };
 }
 
 export async function buildApp(
@@ -123,6 +132,12 @@ export async function buildApp(
           }
         : undefined,
   });
+  const media = deps.media ?? {
+    ocr: ocrImage,
+    transcribe: transcribeAudio,
+    ocrModel: process.env.OCR_MODEL ?? "tesseract.js-eng",
+    asrModel: process.env.ASR_MODEL ?? "Xenova/whisper-tiny",
+  };
   await app.register(aiRoutes, aiOptions);
   await app.register(tutorRoutes, aiOptions);
   await app.register(agentRoutes, aiOptions);
@@ -136,6 +151,7 @@ export async function buildApp(
   await app.register(calendarRoutes);
   await app.register(growthRoutes);
   await app.register(importRoutes);
+  await app.register(mediaRoutes, media);
   await app.register(notificationPreferenceRoutes);
   await app.register(noteRoutes);
   await app.register(focusRoutes);
