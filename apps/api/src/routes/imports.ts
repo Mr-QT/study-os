@@ -25,7 +25,7 @@ import {
 
 import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess } from "../auth/space-access";
-import { previewRows } from "../import/csv";
+import { previewImportRows } from "../import/csv";
 import { notFound, sendError, validationError } from "../http/errors";
 import { apiErrorCodes } from "@study-os/contracts";
 
@@ -58,9 +58,9 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       return notFound(reply);
     }
 
-    const rows = previewRows(parsed.data.kind, parsed.data.csv);
+    const rows = previewImportRows(parsed.data.kind, parsed.data.csv);
     if (rows.length === 0) {
-      return validationError(reply, { message: "CSV 没有数据行（第一行必须是表头）" });
+      return validationError(reply, { message: "没有数据行（CSV 需表头，JSON 需数组）" });
     }
     const validRows = rows.filter((row) => row.valid).length;
 

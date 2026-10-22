@@ -125,6 +125,7 @@ export const tasks = pgTable(
       .notNull()
       .references(() => spaces.id, { onDelete: "cascade" }),
     courseId: uuid("course_id").references(() => courses.id, { onDelete: "set null" }),
+    assigneeId: uuid("assignee_id").references(() => users.id, { onDelete: "set null" }),
     title: text("title").notNull(),
     notes: text("notes"),
     status: taskStatusEnum("status").notNull().default("todo"),
@@ -139,6 +140,7 @@ export const tasks = pgTable(
   (table) => [
     index("tasks_space_idx").on(table.spaceId),
     index("tasks_course_idx").on(table.courseId),
+    index("tasks_assignee_idx").on(table.assigneeId),
     index("tasks_due_idx").on(table.dueAt),
   ],
 );

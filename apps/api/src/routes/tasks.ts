@@ -15,6 +15,7 @@ import { courses, tasks, type Db, type UserRow } from "@study-os/db";
 
 import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess } from "../auth/space-access";
+import { findMembership } from "../auth/space-access";
 import { runAutomations } from "../automation/engine";
 import { toTaskDto } from "../dto";
 import { forbidden, notFound, sendError, validationError } from "../http/errors";
@@ -89,11 +90,19 @@ export const taskRoutes: FastifyPluginAsync = async (app) => {
       if (!course) return notFound(reply, "课程不存在");
     }
 
+    if (
+      parsed.data.assigneeId &&
+      !(await findMembership(database.db, parsed.data.spaceId, parsed.data.assigneeId))
+    ) {
+      return validationError(reply, { message: "被分配人不是空间成员" });
+    }
+
     const [task] = await database.db
       .insert(tasks)
       .values({
         spaceId: parsed.data.spaceId,
         courseId: parsed.data.courseId ?? null,
+        assigneeId: parsed.data.assigneeId ?? null,
         title: parsed.data.title,
         notes: parsed.data.notes ?? null,
         priority: parsed.data.priority ?? "medium",
@@ -177,6 +186,12 @@ export const taskRoutes: FastifyPluginAsync = async (app) => {
       if (!course) return notFound(reply, "课程不存在");
     }
 
+    if (parsed.data.assigneeId) {
+      if (!(await findMembership(database.db, existing.spaceId, parsed.data.assigneeId))) {
+        return validationError(reply, { message: "被分配人不是空间成员" });
+      }
+    }
+
     const { version: _version, ...changes } = parsed.data;
     const [updated] = await database.db
       .update(tasks)
@@ -186,6 +201,7 @@ export const taskRoutes: FastifyPluginAsync = async (app) => {
         ...(changes.status === undefined ? {} : { status: changes.status }),
         ...(changes.priority === undefined ? {} : { priority: changes.priority }),
         ...(changes.courseId === undefined ? {} : { courseId: changes.courseId }),
+        ...(changes.assigneeId === undefined ? {} : { assigneeId: changes.assigneeId }),
         ...(changes.dueAt === undefined
           ? {}
           : { dueAt: changes.dueAt === null ? null : new Date(changes.dueAt) }),

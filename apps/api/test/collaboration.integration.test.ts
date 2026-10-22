@@ -9,6 +9,8 @@ import {
   memberListResponseSchema,
   spaceInviteListResponseSchema,
   spaceInviteResponseSchema,
+  taskListResponseSchema,
+  taskResponseSchema,
 } from "@study-os/contracts";
 
 import { buildApp } from "../src/app";
@@ -166,6 +168,48 @@ describe.skipIf(!databaseUrl)("stage 6: invites, roles and comments", () => {
       headers: { cookie: ownerCookie },
     });
     expect(commentListResponseSchema.parse(after.json()).comments).toHaveLength(0);
+  });
+
+  it("assigns tasks to space members only", async () => {
+    const assigned = await app.inject({
+      method: "POST",
+      url: "/api/v1/tasks",
+      headers: { cookie: ownerCookie },
+      payload: { spaceId, title: "分配给成员", assigneeId: memberId },
+    });
+    expect(assigned.statusCode).toBe(201);
+    const task = taskResponseSchema.parse(assigned.json()).task;
+    expect(task.assigneeId).toBe(memberId);
+
+    const invalid = await app.inject({
+      method: "POST",
+      url: "/api/v1/tasks",
+      headers: { cookie: ownerCookie },
+      payload: {
+        spaceId,
+        title: "分配给非成员",
+        assigneeId: "00000000-0000-0000-0000-000000000000",
+      },
+    });
+    expect(invalid.statusCode).toBe(400);
+
+    const cleared = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/tasks/${task.id}`,
+      headers: { cookie: ownerCookie },
+      payload: { assigneeId: null },
+    });
+    expect(cleared.statusCode).toBe(200);
+    expect(taskResponseSchema.parse(cleared.json()).task.assigneeId).toBeNull();
+
+    const list = await app.inject({
+      method: "GET",
+      url: `/api/v1/tasks?spaceId=${spaceId}`,
+      headers: { cookie: ownerCookie },
+    });
+    expect(taskListResponseSchema.parse(list.json()).tasks.some((item) => item.id === task.id)).toBe(
+      true,
+    );
   });
 
   it("hides invites from non-owners", async () => {

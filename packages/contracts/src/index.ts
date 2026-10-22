@@ -208,6 +208,7 @@ export const taskSchema = z.object({
   id: z.string().min(1),
   spaceId: z.string().min(1),
   courseId: z.string().nullable(),
+  assigneeId: z.string().nullable(),
   title: z.string().min(1),
   notes: z.string().nullable(),
   status: taskStatusSchema,
@@ -223,6 +224,7 @@ export type TaskDto = z.infer<typeof taskSchema>;
 export const createTaskInputSchema = z.object({
   spaceId: z.string().uuid(),
   courseId: z.string().uuid().nullish(),
+  assigneeId: z.string().uuid().nullish(),
   title: z.string().trim().min(1).max(200),
   notes: z.string().max(5000).nullish(),
   priority: taskPrioritySchema.optional(),
@@ -238,6 +240,7 @@ export const updateTaskInputSchema = z
     status: taskStatusSchema.optional(),
     priority: taskPrioritySchema.optional(),
     courseId: z.string().uuid().nullable().optional(),
+    assigneeId: z.string().uuid().nullable().optional(),
     dueAt: isoDateTimeSchema.nullable().optional(),
     estimateMinutes: z.number().int().min(0).max(1440).nullable().optional(),
     version: z.number().int().positive().optional(),

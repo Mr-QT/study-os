@@ -4,6 +4,7 @@ import type {
   CommentDto,
   MemberDto,
   SpaceInviteDto,
+  TaskDto,
 } from "@study-os/contracts";
 import { useCallback, useEffect, useState } from "react";
 
@@ -16,12 +17,19 @@ import {
   joinInviteEndpoint,
   memberEndpoint,
   membersEndpoint,
+  taskEndpoint,
+  taskListEndpoint,
 } from "@/lib/api";
 
 const TEXT = {
   "zh-CN": {
     title: "协作与讨论",
     members: "成员",
+    assignTitle: "任务分配",
+    assignTask: "选择任务",
+    assignMember: "分配给",
+    assign: "分配",
+    unassigned: "未分配",
     invite: "邀请成员",
     role: "角色",
     editor: "编辑者",
@@ -46,6 +54,11 @@ const TEXT = {
   en: {
     title: "Collaboration",
     members: "Members",
+    assignTitle: "Task assignment",
+    assignTask: "Choose a task",
+    assignMember: "Assign to",
+    assign: "Assign",
+    unassigned: "Unassigned",
     invite: "Invite",
     role: "Role",
     editor: "Editor",
@@ -74,6 +87,9 @@ export function CollaborationPanel({ spaceId, locale }: { spaceId: string; local
   const [members, setMembers] = useState<MemberDto[]>([]);
   const [invites, setInvites] = useState<SpaceInviteDto[]>([]);
   const [comments, setComments] = useState<CommentDto[]>([]);
+  const [tasks, setTasks] = useState<TaskDto[]>([]);
+  const [assignTaskId, setAssignTaskId] = useState("");
+  const [assignMemberId, setAssignMemberId] = useState("");
   const [inviteRole, setInviteRole] = useState<"editor" | "viewer">("editor");
   const [copied, setCopied] = useState("");
   const [commentText, setCommentText] = useState("");
@@ -82,10 +98,11 @@ export function CollaborationPanel({ spaceId, locale }: { spaceId: string; local
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
-    const [membersResponse, invitesResponse, commentsResponse] = await Promise.all([
+    const [membersResponse, invitesResponse, commentsResponse, tasksResponse] = await Promise.all([
       fetch(membersEndpoint(spaceId), { credentials: "include", headers: { accept: "application/json" } }),
       fetch(invitesEndpoint(spaceId), { credentials: "include", headers: { accept: "application/json" } }),
       fetch(commentsEndpoint(spaceId), { credentials: "include", headers: { accept: "application/json" } }),
+      fetch(taskListEndpoint(spaceId), { credentials: "include", headers: { accept: "application/json" } }),
     ]);
     if (membersResponse.ok) {
       setMembers(((await membersResponse.json()) as { members: MemberDto[] }).members);
@@ -95,6 +112,9 @@ export function CollaborationPanel({ spaceId, locale }: { spaceId: string; local
     }
     if (commentsResponse.ok) {
       setComments(((await commentsResponse.json()) as { comments: CommentDto[] }).comments);
+    }
+    if (tasksResponse.ok) {
+      setTasks(((await tasksResponse.json()) as { tasks: TaskDto[] }).tasks);
     }
   }, [spaceId]);
 
@@ -189,6 +209,17 @@ export function CollaborationPanel({ spaceId, locale }: { spaceId: string; local
     [load],
   );
 
+  const assign = useCallback(async () => {
+    if (!assignTaskId || !assignMemberId) return;
+    await fetch(taskEndpoint(assignTaskId), {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({ assigneeId: assignMemberId }),
+    });
+    await load();
+  }, [assignMemberId, assignTaskId, load]);
+
   const join = useCallback(async () => {
     if (!joinToken.trim() || busy) return;
     setBusy(true);
@@ -245,6 +276,54 @@ export function CollaborationPanel({ spaceId, locale }: { spaceId: string; local
             </span>
           </li>
         ))}
+      </ul>
+
+      <h4 className="mt-4 text-sm font-semibold text-muted">{text.assignTitle}</h4>
+      <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+        <select
+          value={assignTaskId}
+          onChange={(event) => setAssignTaskId(event.target.value)}
+          aria-label={text.assignTask}
+          className="flex-1 rounded-lg border border-line bg-canvas px-2 py-2 text-sm"
+        >
+          <option value="">{text.assignTask}</option>
+          {tasks.map((task) => (
+            <option key={task.id} value={task.id}>
+              {task.title}
+            </option>
+          ))}
+        </select>
+        <select
+          value={assignMemberId}
+          onChange={(event) => setAssignMemberId(event.target.value)}
+          aria-label={text.assignMember}
+          className="flex-1 rounded-lg border border-line bg-canvas px-2 py-2 text-sm"
+        >
+          <option value="">{text.assignMember}</option>
+          {members.map((member) => (
+            <option key={member.userId} value={member.userId}>
+              {member.displayName}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={() => void assign()}
+          disabled={!assignTaskId || !assignMemberId}
+          className="rounded-lg bg-accent-ink px-3 py-1.5 text-xs font-medium text-canvas disabled:opacity-50"
+        >
+          {text.assign}
+        </button>
+      </div>
+      <ul className="mt-2 flex flex-col gap-1 text-xs text-muted">
+        {tasks.slice(0, 8).map((task) => {
+          const assignee = members.find((member) => member.userId === task.assigneeId);
+          return (
+            <li key={task.id}>
+              {task.title} · {assignee ? assignee.displayName : text.unassigned}
+            </li>
+          );
+        })}
       </ul>
 
       <div className="mt-4 flex flex-wrap items-end gap-2">

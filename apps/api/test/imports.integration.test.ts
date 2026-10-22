@@ -158,6 +158,39 @@ describe.skipIf(!databaseUrl)("stage 5.2: CSV import preview, commit and rollbac
     expect(again.statusCode).toBe(409);
   });
 
+  it("imports tasks from a JSON array", async () => {
+    const preview = await app.inject({
+      method: "POST",
+      url: "/api/v1/imports/preview",
+      headers: { cookie },
+      payload: {
+        spaceId,
+        kind: "tasks",
+        filename: "tasks.json",
+        csv: JSON.stringify([{ title: "JSON任务", dueAt: "2026-12-02T09:00:00Z" }]),
+      },
+    });
+    expect(preview.statusCode).toBe(200);
+    const body = importPreviewResponseSchema.parse(preview.json());
+    expect(body.batch.validRows).toBe(1);
+
+    const commit = await app.inject({
+      method: "POST",
+      url: `/api/v1/imports/${body.batch.id}/commit`,
+      headers: { cookie },
+    });
+    expect(importCommitResponseSchema.parse(commit.json()).created).toBe(1);
+
+    const tasks = await app.inject({
+      method: "GET",
+      url: `/api/v1/tasks?spaceId=${spaceId}`,
+      headers: { cookie },
+    });
+    expect(taskListResponseSchema.parse(tasks.json()).tasks.map((task) => task.title)).toContain(
+      "JSON任务",
+    );
+  });
+
   it("hides imports from other users", async () => {
     const other = await app.inject({ method: "POST", url: "/api/v1/auth/guest" });
     const response = await app.inject({

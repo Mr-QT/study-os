@@ -75,6 +75,7 @@ export function toTaskDto(row: TaskRow): TaskDto {
     id: row.id,
     spaceId: row.spaceId,
     courseId: row.courseId,
+    assigneeId: row.assigneeId,
     title: row.title,
     notes: row.notes,
     status: row.status,

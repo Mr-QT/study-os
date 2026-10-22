@@ -1,11 +1,11 @@
 # PROJECT_STATE — 真实项目状态
 
 - 日期：2026-10-22
-- 当前阶段：7 — 运维与产品成熟化（7.1 完成）
-- 当前里程碑：6.1 协作 + 7.1 指标与备份恢复
+- 当前阶段：7 — 运维与产品成熟化（6.1/6.2/7.1 完成）
+- 当前里程碑：6.2 任务分配 + JSON 迁移；7.1 指标与备份恢复
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 119 通过（contracts 10、api 109）；Playwright 16 通过
-- 数据库：PostgreSQL 16（Docker Compose，持久卷），33 张表，迁移 0000–0015
+- 测试结果：单元/集成 121 通过（contracts 10、api 111）；Playwright 16 通过
+- 数据库：PostgreSQL 16（Docker Compose，持久卷），33 张表，迁移 0000–0016
 - 部署状态：未部署
 - 最近功能 commit：`bfa06f3`
 
@@ -26,7 +26,7 @@
 | 命令 | 结果 |
 |---|---|
 | `pnpm lint` / `typecheck` / `build` | 通过 |
-| `pnpm test` | 119 passed（contracts 10、api 109） |
+| `pnpm test` | 121 passed（contracts 10、api 111） |
 | `pnpm test:e2e` | 16 passed（含作品集、迁移、目标/习惯） |
 | `pnpm worker` | 启动成功，冒烟一次发送 4 条到期通知 |
 
@@ -47,7 +47,8 @@
   - **5.2 迁移中心**：CSV 导入任务/题库；预览逐行校验、确认导入、按批次回滚（软删除）、原件保存与 SHA-256、下载原件；`import_batches`/`import_items` 记录来源；Web 预览表与批次列表。
   - **5.3 作品集与多模态**：独立 `/spaces/:id/portfolio` 页面（总计、目标、习惯、成就、导出）；本地 OCR（tesseract.js，自动下载 eng 语言包）与音频转写（Transformers.js Whisper-tiny，hf-mirror），WAV 16-bit 输入；识别结果可一键保存为笔记。
   - **6.1 轻量协作**：邀请码（角色/有效期/次数）、加入空间、成员列表与角色调整（owner/editor/viewer）、移除成员、空间评论（发帖/列表/删除，作者或 owner）；viewer 写操作被拒绝；Web「协作与讨论」面板与首页邀请码加入表单。
-  - **7.1 运维基础**：`/metrics` Prometheus 文本（进程/数据库/表行数，无用户内容）、`pnpm backup`（pg_dump + 保留 7 份）、`pnpm restore`（确认后覆盖，恢复前终止连接）、`docs/OPERATIONS.md`；备份已恢复到临时库验证 33 张表。
+  - **7.1 运维基础**：`/metrics` Prometheus 文本（进程/数据库/表行数，无用户内容）、`pnpm backup`（pg_dump + 保留 7 份）、`pnpm restore`（确认后覆盖，恢复前终止连接）、`docs/RUNBOOK.md`；备份已恢复到临时库验证 33 张表。
+  - **6.2 任务分配与迁移扩展**：任务支持 `assigneeId`（仅空间成员，可清空，viewer 不可写）；协作面板可选择任务与成员分配并显示当前负责人；迁移中心在 CSV 之外支持 JSON 数组/`{items|rows}`，共用校验与回滚。
 
 ## 未完成项
 
