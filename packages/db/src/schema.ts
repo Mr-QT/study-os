@@ -741,6 +741,59 @@ export const importItems = pgTable(
   (table) => [index("import_items_batch_idx").on(table.batchId)],
 );
 
+export const commentEntityEnum = pgEnum("comment_entity", [
+  "space",
+  "task",
+  "note",
+  "question",
+  "exam",
+]);
+
+export const spaceInvites = pgTable(
+  "space_invites",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    token: text("token").notNull(),
+    role: membershipRoleEnum("role").notNull().default("viewer"),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    maxUses: integer("max_uses").notNull().default(1),
+    uses: integer("uses").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("space_invites_token_unique").on(table.token),
+    index("space_invites_space_idx").on(table.spaceId),
+  ],
+);
+
+export const comments = pgTable(
+  "comments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    entityType: commentEntityEnum("entity_type").notNull().default("space"),
+    entityId: uuid("entity_id").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("comments_space_idx").on(table.spaceId),
+    index("comments_entity_idx").on(table.entityType, table.entityId),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -774,3 +827,5 @@ export type HabitRow = typeof habits.$inferSelect;
 export type HabitCheckinRow = typeof habitCheckins.$inferSelect;
 export type ImportBatchRow = typeof importBatches.$inferSelect;
 export type ImportItemRow = typeof importItems.$inferSelect;
+export type SpaceInviteRow = typeof spaceInvites.$inferSelect;
+export type CommentRow = typeof comments.$inferSelect;

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { AutomationPanel } from "@/components/automation-panel";
+import { CollaborationPanel } from "@/components/collaboration-panel";
 import { GrowthPanel } from "@/components/growth-panel";
 import { InsightsPanel } from "@/components/insights-panel";
 import { MediaPanel } from "@/components/media-panel";
@@ -158,6 +159,7 @@ export default async function SpacePage({
           <GrowthPanel spaceId={id} locale={lang} />
           <MigrationPanel spaceId={id} locale={lang} />
           <MediaPanel spaceId={id} locale={lang} />
+          <CollaborationPanel spaceId={id} locale={lang} />
           <AutomationPanel spaceId={id} locale={lang} />
           <InsightsPanel spaceId={id} locale={lang} />
         </div>

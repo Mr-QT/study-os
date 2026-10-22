@@ -1249,3 +1249,79 @@ export const mediaTextResponseSchema = z.object({
   model: z.string().min(1),
 });
 export type MediaTextResponse = z.infer<typeof mediaTextResponseSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Stage 6: lightweight collaboration                                  */
+/* ------------------------------------------------------------------ */
+
+export const inviteRoleSchema = z.enum(["editor", "viewer"]);
+export const memberRoleSchema = z.enum(["owner", "editor", "viewer"]);
+
+export const spaceInviteSchema = z.object({
+  id: z.string().min(1),
+  spaceId: z.string().min(1),
+  token: z.string().min(1),
+  role: inviteRoleSchema,
+  expiresAt: z.string().min(1),
+  maxUses: z.number().int().positive(),
+  uses: z.number().int().nonnegative(),
+  createdAt: z.string().min(1),
+});
+export type SpaceInviteDto = z.infer<typeof spaceInviteSchema>;
+
+export const createInviteInputSchema = z.object({
+  role: inviteRoleSchema,
+  expiresInHours: z.number().int().min(1).max(720).optional(),
+  maxUses: z.number().int().min(1).max(100).optional(),
+});
+
+export const spaceInviteListResponseSchema = z.object({
+  invites: z.array(spaceInviteSchema),
+});
+export const spaceInviteResponseSchema = z.object({ invite: spaceInviteSchema });
+
+export const memberSchema = z.object({
+  userId: z.string().min(1),
+  displayName: z.string().min(1),
+  role: memberRoleSchema,
+  createdAt: z.string().min(1),
+});
+export type MemberDto = z.infer<typeof memberSchema>;
+export const memberListResponseSchema = z.object({ members: z.array(memberSchema) });
+
+export const updateMemberRoleInputSchema = z.object({ role: inviteRoleSchema });
+
+export const joinInviteResponseSchema = z.object({
+  spaceId: z.string().min(1),
+  role: memberRoleSchema,
+});
+
+export const commentEntitySchema = z.enum(["space", "task", "note", "question", "exam"]);
+
+export const commentSchema = z.object({
+  id: z.string().min(1),
+  spaceId: z.string().min(1),
+  entityType: commentEntitySchema,
+  entityId: z.string().min(1),
+  userId: z.string().min(1),
+  authorName: z.string().min(1),
+  body: z.string().min(1),
+  createdAt: z.string().min(1),
+});
+export type CommentDto = z.infer<typeof commentSchema>;
+
+export const createCommentInputSchema = z.object({
+  spaceId: z.string().uuid(),
+  entityType: commentEntitySchema.optional(),
+  entityId: z.string().uuid(),
+  body: z.string().trim().min(1).max(2000),
+});
+
+export const commentQuerySchema = z.object({
+  spaceId: z.string().uuid(),
+  entityType: commentEntitySchema.optional(),
+  entityId: z.string().uuid().optional(),
+});
+
+export const commentListResponseSchema = z.object({ comments: z.array(commentSchema) });
+export const commentResponseSchema = z.object({ comment: commentSchema });

@@ -17,6 +17,10 @@
 | P5-03 | CSV 迁移中心 | DONE | 106 测试 + 15 E2E；迁移 0014；预览/回滚/原件 |
 | P5-04 | 多模态（OCR / 音频转写，本地） | DONE | `/media/ocr`、`/media/transcribe`、媒体面板；真实 OCR/Whisper 冒烟 |
 | P5-05 | 作品集页面 | DONE | `/spaces/:id/portfolio` + 导出；16 E2E |
+| P6-01 | 邀请、成员角色与空间评论 | DONE | 118 测试；迁移 0015；协作面板 |
+| P6-02 | 插件 SDK / Webhook / 第三方连接器 | TODO | 后续 |
+| P7-01 | 指标、备份/恢复与运维文档 | DONE | `/metrics`、`pnpm backup/restore`、临时库恢复验证 |
+| P7-02 | 发布渠道、升级中心、性能与恢复演练 | TODO | 后续 |
 | P5 | 多模态/迁移/成长/作品集 | TODO | 后续阶段 |
 
 状态限定：TODO / IN_PROGRESS / BLOCKED / PARTIAL / DONE（DONE 需证据）。

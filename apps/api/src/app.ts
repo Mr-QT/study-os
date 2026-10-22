@@ -22,6 +22,7 @@ import { assessmentRoutes } from "./routes/assessment";
 import { authRoutes } from "./routes/auth";
 import { automationRoutes } from "./routes/automation";
 import { calendarRoutes } from "./routes/calendar";
+import { collaborationRoutes } from "./routes/collaboration";
 import { learningRoutes } from "./routes/courses";
 import { fileRoutes } from "./routes/files";
 import { focusRoutes } from "./routes/focus";
@@ -44,6 +45,7 @@ import { syncRoutes } from "./routes/sync";
 import { ocrImage } from "./media/ocr";
 import { transcribeAudio } from "./media/transcribe";
 import { mediaRoutes } from "./routes/media";
+import { metricsRoutes } from "./routes/metrics";
 import { taskRoutes } from "./routes/tasks";
 import { tutorRoutes } from "./routes/tutor";
 
@@ -111,6 +113,7 @@ export async function buildApp(
   });
 
   await app.register(healthRoutes, { version: config.version });
+  await app.register(metricsRoutes);
   const aiProvider = deps.aiProvider === undefined ? createAiProvider(config) : deps.aiProvider;
   const aiOptions = {
     provider: aiProvider,
@@ -149,6 +152,7 @@ export async function buildApp(
   await app.register(learningRoutes);
   await app.register(taskRoutes);
   await app.register(calendarRoutes);
+  await app.register(collaborationRoutes);
   await app.register(growthRoutes);
   await app.register(importRoutes);
   await app.register(mediaRoutes, media);

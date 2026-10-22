@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { JoinSpaceForm } from "@/components/join-space-form";
 import { SystemStatus } from "@/components/system-status";
 import { WorkspaceHome } from "@/components/workspace-home";
 import { getDictionary, isLocale } from "@/lib/i18n";
@@ -58,6 +59,10 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
               privacySensitive: dict.privacySensitive,
             }}
           />
+
+          <div className="mt-4">
+            <JoinSpaceForm locale={lang} />
+          </div>
         </section>
 
         <div className="grid gap-6 lg:grid-cols-2">

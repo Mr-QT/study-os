@@ -37,6 +37,8 @@ export const PROFILE_SUMMARY_ENDPOINT = `${API_BASE_URL}/api/v1/profile/summary`
 export const PROFILE_EXPORT_ENDPOINT = `${API_BASE_URL}/api/v1/profile/export`;
 export const IMPORTS_ENDPOINT = `${API_BASE_URL}/api/v1/imports`;
 export const MEDIA_ENDPOINT = `${API_BASE_URL}/api/v1/media`;
+export const COMMENTS_ENDPOINT = `${API_BASE_URL}/api/v1/comments`;
+export const INVITES_ENDPOINT = `${API_BASE_URL}/api/v1/invites`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -212,4 +214,32 @@ export function importOriginalEndpoint(batchId: string): string {
 
 export function mediaEndpoint(kind: "ocr" | "transcribe", spaceId: string): string {
   return `${MEDIA_ENDPOINT}/${kind}?spaceId=${encodeURIComponent(spaceId)}`;
+}
+
+export function membersEndpoint(spaceId: string): string {
+  return `${SPACES_ENDPOINT}/${spaceId}/members`;
+}
+
+export function memberEndpoint(spaceId: string, userId: string): string {
+  return `${membersEndpoint(spaceId)}/${userId}`;
+}
+
+export function invitesEndpoint(spaceId: string): string {
+  return `${SPACES_ENDPOINT}/${spaceId}/invites`;
+}
+
+export function inviteEndpoint(spaceId: string, inviteId: string): string {
+  return `${invitesEndpoint(spaceId)}/${inviteId}`;
+}
+
+export function joinInviteEndpoint(token: string): string {
+  return `${INVITES_ENDPOINT}/${token}/join`;
+}
+
+export function commentsEndpoint(spaceId: string): string {
+  return `${COMMENTS_ENDPOINT}?spaceId=${encodeURIComponent(spaceId)}&entityType=space&entityId=${encodeURIComponent(spaceId)}`;
+}
+
+export function commentEndpoint(commentId: string): string {
+  return `${COMMENTS_ENDPOINT}/${commentId}`;
 }
