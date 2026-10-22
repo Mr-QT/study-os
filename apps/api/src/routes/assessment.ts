@@ -30,6 +30,7 @@ import {
 import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess } from "../auth/space-access";
 import { runAutomations } from "../automation/engine";
+import { queueWebhooks } from "../webhooks/dispatch";
 import { notFound, validationError } from "../http/errors";
 
 function toExamDto(row: ExamRow): ExamDto {
@@ -307,6 +308,11 @@ export const assessmentRoutes: FastifyPluginAsync = async (app) => {
         spaceId: exam.spaceId,
         userId: user.id,
         context: { examId: attempt.examId, percentage },
+      });
+      await queueWebhooks(database.db, {
+        spaceId: exam.spaceId,
+        event: "exam.submitted",
+        payload: { examId: attempt.examId, percentage },
       });
     } catch {
       // Automation must never fail the user's write.

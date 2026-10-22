@@ -17,6 +17,7 @@ import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess } from "../auth/space-access";
 import { findMembership } from "../auth/space-access";
 import { runAutomations } from "../automation/engine";
+import { queueWebhooks } from "../webhooks/dispatch";
 import { toTaskDto } from "../dto";
 import { forbidden, notFound, sendError, validationError } from "../http/errors";
 import { recordChange } from "../sync/record";
@@ -229,6 +230,11 @@ export const taskRoutes: FastifyPluginAsync = async (app) => {
           spaceId: updated.spaceId,
           userId: user.id,
           context: { taskId: updated.id, status: "done" },
+        });
+        await queueWebhooks(database.db, {
+          spaceId: updated.spaceId,
+          event: "task.completed",
+          payload: { taskId: updated.id, title: updated.title },
         });
       } catch {
         // Automation must never fail the user's write.

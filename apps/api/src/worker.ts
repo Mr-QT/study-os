@@ -5,6 +5,7 @@ import { config as loadEnv } from "dotenv";
 
 import { dispatchDueNotifications } from "./notifications/dispatch";
 import { createDigest, digestCandidates } from "./notifications/preferences";
+import { deliverDueWebhooks } from "./webhooks/dispatch";
 
 loadEnv({ path: fileURLToPath(new URL("../../../.env", import.meta.url)), quiet: true });
 
@@ -29,6 +30,10 @@ async function tick(): Promise<void> {
       console.log(
         `[worker] sent=${result.sent} skipped=${result.skipped} failed=${result.failed}`,
       );
+    }
+    const webhooks = await deliverDueWebhooks(db);
+    if (webhooks.delivered > 0 || webhooks.failed > 0) {
+      console.log(`[worker] webhooks delivered=${webhooks.delivered} failed=${webhooks.failed}`);
     }
   } catch (error) {
     console.error("[worker] dispatch failed", error);

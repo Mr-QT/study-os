@@ -39,6 +39,8 @@ export const IMPORTS_ENDPOINT = `${API_BASE_URL}/api/v1/imports`;
 export const MEDIA_ENDPOINT = `${API_BASE_URL}/api/v1/media`;
 export const COMMENTS_ENDPOINT = `${API_BASE_URL}/api/v1/comments`;
 export const INVITES_ENDPOINT = `${API_BASE_URL}/api/v1/invites`;
+export const WEBHOOKS_ENDPOINT = `${API_BASE_URL}/api/v1/webhooks`;
+export const SYSTEM_STATUS_ENDPOINT = `${API_BASE_URL}/api/v1/system/status`;
 
 export function spaceEndpoint(spaceId: string): string {
   return `${SPACES_ENDPOINT}/${spaceId}`;
@@ -242,4 +244,20 @@ export function commentsEndpoint(spaceId: string): string {
 
 export function commentEndpoint(commentId: string): string {
   return `${COMMENTS_ENDPOINT}/${commentId}`;
+}
+
+export function webhooksEndpoint(spaceId: string): string {
+  return `${SPACES_ENDPOINT}/${spaceId}/webhooks`;
+}
+
+export function webhookEndpoint(webhookId: string): string {
+  return `${WEBHOOKS_ENDPOINT}/${webhookId}`;
+}
+
+export function webhookTestEndpoint(webhookId: string): string {
+  return `${webhookEndpoint(webhookId)}/test`;
+}
+
+export function webhookDeliveriesEndpoint(webhookId: string): string {
+  return `${webhookEndpoint(webhookId)}/deliveries`;
 }

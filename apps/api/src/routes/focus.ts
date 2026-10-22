@@ -16,6 +16,7 @@ import { focusSessions, tasks } from "@study-os/db";
 import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess } from "../auth/space-access";
 import { runAutomations } from "../automation/engine";
+import { queueWebhooks } from "../webhooks/dispatch";
 import { toFocusSessionDto } from "../dto";
 import { notFound, sendError, validationError } from "../http/errors";
 
@@ -146,6 +147,11 @@ export const focusRoutes: FastifyPluginAsync = async (app) => {
           sessionId: updated.id,
           durationSeconds: updated.durationSeconds ?? 0,
         },
+      });
+      await queueWebhooks(database.db, {
+        spaceId: updated.spaceId,
+        event: "focus.completed",
+        payload: { sessionId: updated.id, durationSeconds: updated.durationSeconds ?? 0 },
       });
     } catch {
       // Automation must never fail the user's write.

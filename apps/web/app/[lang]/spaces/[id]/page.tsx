@@ -9,6 +9,7 @@ import { MediaPanel } from "@/components/media-panel";
 import { MigrationPanel } from "@/components/migration-panel";
 import { PlansPanel } from "@/components/plans-panel";
 import { SpaceWorkspace } from "@/components/space-workspace";
+import { WebhooksPanel } from "@/components/webhooks-panel";
 import { getDictionary, isLocale } from "@/lib/i18n";
 
 export default async function SpacePage({
@@ -160,6 +161,7 @@ export default async function SpacePage({
           <MigrationPanel spaceId={id} locale={lang} />
           <MediaPanel spaceId={id} locale={lang} />
           <CollaborationPanel spaceId={id} locale={lang} />
+          <WebhooksPanel spaceId={id} locale={lang} />
           <AutomationPanel spaceId={id} locale={lang} />
           <InsightsPanel spaceId={id} locale={lang} />
         </div>

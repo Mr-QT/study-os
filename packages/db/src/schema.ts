@@ -796,6 +796,54 @@ export const comments = pgTable(
   ],
 );
 
+export const webhookStatusEnum = pgEnum("webhook_status", ["pending", "success", "failed"]);
+
+export const webhookEndpoints = pgTable(
+  "webhook_endpoints",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    secret: text("secret").notNull(),
+    events: text("events").notNull().default("[]"),
+    enabled: boolean("enabled").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("webhook_endpoints_space_idx").on(table.spaceId)],
+);
+
+export const webhookDeliveries = pgTable(
+  "webhook_deliveries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    endpointId: uuid("endpoint_id")
+      .notNull()
+      .references(() => webhookEndpoints.id, { onDelete: "cascade" }),
+    spaceId: uuid("space_id")
+      .notNull()
+      .references(() => spaces.id, { onDelete: "cascade" }),
+    event: text("event").notNull(),
+    payload: text("payload").notNull(),
+    status: webhookStatusEnum("status").notNull().default("pending"),
+    attempts: integer("attempts").notNull().default(0),
+    responseStatus: integer("response_status"),
+    error: text("error"),
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    deliveredAt: timestamp("delivered_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("webhook_deliveries_endpoint_idx").on(table.endpointId),
+    index("webhook_deliveries_status_idx").on(table.status, table.nextAttemptAt),
+  ],
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
 export type SpaceRow = typeof spaces.$inferSelect;
@@ -831,3 +879,5 @@ export type ImportBatchRow = typeof importBatches.$inferSelect;
 export type ImportItemRow = typeof importItems.$inferSelect;
 export type SpaceInviteRow = typeof spaceInvites.$inferSelect;
 export type CommentRow = typeof comments.$inferSelect;
+export type WebhookEndpointRow = typeof webhookEndpoints.$inferSelect;
+export type WebhookDeliveryRow = typeof webhookDeliveries.$inferSelect;

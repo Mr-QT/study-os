@@ -1328,3 +1328,94 @@ export const commentQuerySchema = z.object({
 
 export const commentListResponseSchema = z.object({ comments: z.array(commentSchema) });
 export const commentResponseSchema = z.object({ comment: commentSchema });
+
+/* ------------------------------------------------------------------ */
+/* Stage 6.3: outbound webhooks                                        */
+/* ------------------------------------------------------------------ */
+
+export const webhookEventSchema = z.enum([
+  "task.completed",
+  "focus.completed",
+  "exam.submitted",
+  "comment.created",
+  "ping",
+]);
+export type WebhookEvent = z.infer<typeof webhookEventSchema>;
+
+export const webhookEndpointSchema = z.object({
+  id: z.string().min(1),
+  url: z.string().url(),
+  events: z.array(webhookEventSchema),
+  enabled: z.boolean(),
+  createdAt: z.string().min(1),
+  updatedAt: z.string().min(1),
+});
+export type WebhookEndpointDto = z.infer<typeof webhookEndpointSchema>;
+
+export const createWebhookInputSchema = z.object({
+  url: z.string().url().refine((url) => url.startsWith("http://") || url.startsWith("https://"), {
+    message: "仅支持 http/https",
+  }),
+  events: z.array(webhookEventSchema).min(1).max(10),
+  enabled: z.boolean().optional(),
+});
+
+export const updateWebhookInputSchema = z
+  .object({
+    url: z.string().url().optional(),
+    events: z.array(webhookEventSchema).min(1).max(10).optional(),
+    enabled: z.boolean().optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, { message: "至少需要一个字段" });
+
+export const webhookEndpointListResponseSchema = z.object({
+  endpoints: z.array(webhookEndpointSchema),
+});
+export const webhookEndpointResponseSchema = z.object({
+  endpoint: webhookEndpointSchema,
+});
+export const webhookEndpointSecretResponseSchema = z.object({
+  endpoint: webhookEndpointSchema,
+  secret: z.string().min(1),
+});
+
+export const webhookDeliverySchema = z.object({
+  id: z.string().min(1),
+  event: webhookEventSchema.or(z.string()),
+  status: z.enum(["pending", "success", "failed"]),
+  attempts: z.number().int().nonnegative(),
+  responseStatus: z.number().int().nullable(),
+  error: z.string().nullable(),
+  nextAttemptAt: z.string().min(1),
+  createdAt: z.string().min(1),
+  deliveredAt: z.string().nullable(),
+});
+export type WebhookDeliveryDto = z.infer<typeof webhookDeliverySchema>;
+
+export const webhookDeliveryListResponseSchema = z.object({
+  deliveries: z.array(webhookDeliverySchema),
+});
+export const webhookTestResponseSchema = z.object({
+  delivery: webhookDeliverySchema.nullable(),
+});
+
+/* ------------------------------------------------------------------ */
+/* Stage 7.2: system status / upgrade center                           */
+/* ------------------------------------------------------------------ */
+
+export const systemStatusSchema = z.object({
+  version: z.string().min(1),
+  nodeVersion: z.string().min(1),
+  uptimeSeconds: z.number().int().nonnegative(),
+  database: z.enum(["ok", "unavailable"]),
+  appliedMigrations: z.number().int().nonnegative(),
+  latestBackup: z
+    .object({
+      name: z.string().min(1),
+      bytes: z.number().int().nonnegative(),
+      createdAt: z.string().min(1),
+    })
+    .nullable(),
+  checkedAt: z.string().min(1),
+});
+export type SystemStatus = z.infer<typeof systemStatusSchema>;

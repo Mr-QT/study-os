@@ -41,6 +41,7 @@ import { ragRoutes } from "./routes/rag";
 import { ruleDraftRoutes } from "./routes/rule-draft";
 import { spaceRoutes } from "./routes/spaces";
 import { statsRoutes } from "./routes/stats";
+import { systemRoutes } from "./routes/system";
 import { syncRoutes } from "./routes/sync";
 import { ocrImage } from "./media/ocr";
 import { transcribeAudio } from "./media/transcribe";
@@ -48,6 +49,7 @@ import { mediaRoutes } from "./routes/media";
 import { metricsRoutes } from "./routes/metrics";
 import { taskRoutes } from "./routes/tasks";
 import { tutorRoutes } from "./routes/tutor";
+import { webhookRoutes } from "./routes/webhooks";
 
 export interface AppDependencies {
   aiProvider?: AiProvider | null;
@@ -113,6 +115,7 @@ export async function buildApp(
   });
 
   await app.register(healthRoutes, { version: config.version });
+  await app.register(systemRoutes, { version: config.version });
   await app.register(metricsRoutes);
   const aiProvider = deps.aiProvider === undefined ? createAiProvider(config) : deps.aiProvider;
   const aiOptions = {
@@ -153,6 +156,7 @@ export async function buildApp(
   await app.register(taskRoutes);
   await app.register(calendarRoutes);
   await app.register(collaborationRoutes);
+  await app.register(webhookRoutes);
   await app.register(growthRoutes);
   await app.register(importRoutes);
   await app.register(mediaRoutes, media);

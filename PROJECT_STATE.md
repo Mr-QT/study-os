@@ -1,11 +1,11 @@
 # PROJECT_STATE — 真实项目状态
 
 - 日期：2026-10-22
-- 当前阶段：7 — 运维与产品成熟化（6.1/6.2/7.1 完成）
-- 当前里程碑：6.2 任务分配 + JSON 迁移；7.1 指标与备份恢复
+- 当前阶段：7 — 运维与产品成熟化（6.1/6.2/6.3/7.1/7.2 完成）
+- 当前里程碑：6.3 出站 Webhook；7.2 系统状态中心
 - 应用代码：`apps/web`、`apps/api`、`packages/contracts`、`packages/db`
-- 测试结果：单元/集成 121 通过（contracts 10、api 111）；Playwright 16 通过
-- 数据库：PostgreSQL 16（Docker Compose，持久卷），33 张表，迁移 0000–0016
+- 测试结果：单元/集成 125 通过（contracts 10、api 115）；Playwright 16 通过
+- 数据库：PostgreSQL 16（Docker Compose，持久卷），35 张表，迁移 0000–0017
 - 部署状态：未部署
 - 最近功能 commit：`cb51b8d`
 
@@ -26,7 +26,7 @@
 | 命令 | 结果 |
 |---|---|
 | `pnpm lint` / `typecheck` / `build` | 通过 |
-| `pnpm test` | 121 passed（contracts 10、api 111） |
+| `pnpm test` | 125 passed（contracts 10、api 115） |
 | `pnpm test:e2e` | 16 passed（含作品集、迁移、目标/习惯） |
 | `pnpm worker` | 启动成功，冒烟一次发送 4 条到期通知 |
 
@@ -49,6 +49,8 @@
   - **6.1 轻量协作**：邀请码（角色/有效期/次数）、加入空间、成员列表与角色调整（owner/editor/viewer）、移除成员、空间评论（发帖/列表/删除，作者或 owner）；viewer 写操作被拒绝；Web「协作与讨论」面板与首页邀请码加入表单。
   - **7.1 运维基础**：`/metrics` Prometheus 文本（进程/数据库/表行数，无用户内容）、`pnpm backup`（pg_dump + 保留 7 份）、`pnpm restore`（确认后覆盖，恢复前终止连接）、`docs/RUNBOOK.md`；备份已恢复到临时库验证 33 张表。
   - **6.2 任务分配与迁移扩展**：任务支持 `assigneeId`（仅空间成员，可清空，viewer 不可写）；协作面板可选择任务与成员分配并显示当前负责人；迁移中心在 CSV 之外支持 JSON 数组/`{items|rows}`，共用校验与回滚。
+  - **6.3 出站 Webhook**：端点 CRUD、事件订阅（task/focus/exam/comment/ping）、HMAC-SHA256 签名（`x-studyos-signature: v1=...`）、5 秒超时、最多 3 次指数退避重试、worker 投递、测试投递与投递记录、Web 管理面板。
+  - **7.2 系统状态**：`/api/v1/system/status` 返回版本、Node、数据库、已应用迁移数、最近备份；首页展示状态与备份过期提醒。
 
 ## 未完成项
 

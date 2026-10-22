@@ -40,6 +40,7 @@ import { requireUser } from "../auth/require-user";
 import { ensureSpaceAccess, findMembership } from "../auth/space-access";
 import { forbidden, notFound, sendError, validationError } from "../http/errors";
 import { apiErrorCodes } from "@study-os/contracts";
+import { queueWebhooks } from "../webhooks/dispatch";
 
 async function isOwner(db: Db, userId: string, spaceId: string): Promise<boolean> {
   const [space] = await db
@@ -385,6 +386,19 @@ export const collaborationRoutes: FastifyPluginAsync = async (app) => {
       })
       .returning();
     if (!comment) return reply;
+    try {
+      await queueWebhooks(database.db, {
+        spaceId: parsed.data.spaceId,
+        event: "comment.created",
+        payload: {
+          commentId: comment.id,
+          entityType,
+          entityId: parsed.data.entityId,
+        },
+      });
+    } catch {
+      // Webhook queuing must never fail the comment.
+    }
     return reply
       .code(201)
       .send(commentResponseSchema.parse({ comment: toCommentDto(comment, user.displayName) }));

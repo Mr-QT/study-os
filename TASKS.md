@@ -18,9 +18,11 @@
 | P5-04 | 多模态（OCR / 音频转写，本地） | DONE | `/media/ocr`、`/media/transcribe`、媒体面板；真实 OCR/Whisper 冒烟 |
 | P5-05 | 作品集页面 | DONE | `/spaces/:id/portfolio` + 导出；16 E2E |
 | P6-01 | 邀请、成员角色、空间评论与任务分配 | DONE | 121 测试；迁移 0015/0016；协作面板 |
-| P6-02 | 插件 SDK / Webhook / 第三方连接器 | TODO | 后续 |
+| P6-02 | 出站 Webhook（签名、重试、worker） | DONE | 125 测试；迁移 0017；Webhook 面板 |
+| P6-03 | 插件 SDK / 第三方连接器 | TODO | 后续 |
 | P7-01 | 指标、备份/恢复与运维文档 | DONE | `/metrics`、`pnpm backup/restore`、临时库恢复验证 |
-| P7-02 | 发布渠道、升级中心、性能与恢复演练 | TODO | 后续 |
+| P7-02 | 系统状态中心 | DONE | `/system/status` + 首页状态面板 |
+| P7-03 | 发布渠道、性能与恢复演练自动化 | TODO | 后续 |
 | P5 | 多模态/迁移/成长/作品集 | TODO | 后续阶段 |
 
 状态限定：TODO / IN_PROGRESS / BLOCKED / PARTIAL / DONE（DONE 需证据）。

@@ -120,6 +120,13 @@
       "when": 1792673233953,
       "tag": "0016_boring_prowler",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792673501878,
+      "tag": "0017_public_pride",
+      "breakpoints": true
     }
   ]
 }
