@@ -2,7 +2,7 @@ FROM node:22-bookworm-slim AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends nginx gettext-base ca-certificates openssl \
+  && apt-get install -y --no-install-recommends nginx gettext-base ca-certificates openssl curl \
   && rm -rf /var/lib/apt/lists/* \
   && corepack enable \
   && corepack prepare pnpm@10.34.7 --activate
